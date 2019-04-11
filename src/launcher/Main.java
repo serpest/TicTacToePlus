@@ -1,16 +1,19 @@
 package launcher;
 
 import controller.TicTacToeController;
-import model.exceptions.GridPositionOccupiedException;
-import model.exceptions.InvalidNumberOfPlayersException;
 import view.CLIView;
 
 public class Main {
 
-	public static void main(String[] args) throws InvalidNumberOfPlayersException, GridPositionOccupiedException {
-		TicTacToeController ticTacToeController = new TicTacToeController(CLIView.getInstance());
+	/**
+	 * It plays the game in an infinite loop.
+	 * 
+	 * @param args not required
+	 */
+	public static void main(String[] args) {
+		TicTacToeController ticTacToeController;
 		while (true) {
-			ticTacToeController.initMenu();
+			ticTacToeController = new TicTacToeController(CLIView.getInstance());
 			ticTacToeController.play();
 		}
 	}

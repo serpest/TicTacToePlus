@@ -17,11 +17,6 @@ import model.exceptions.MaximumPlayerNumberExceededException;
 
 public class CLIView implements View {
 
-	private final static byte DEFAULT_PLAY = 1;
-	private final static byte CUSTOM_PLAY = 2;
-
-
-
 	private Scanner sc;
 
 
@@ -30,9 +25,10 @@ public class CLIView implements View {
 	public TicTacToeGame getTicTacToeGame() {
 		sc = new Scanner(System.in);
 		TicTacToeGame game = null;
-		byte mode;
-		while (true) {
-			System.out.print("Select a game mode:" + System.lineSeparator() + "\t" + DEFAULT_PLAY + " - Default play" + System.lineSeparator() + "\t" + CUSTOM_PLAY + " - Custom play" + System.lineSeparator() + "> ");
+		int mode;
+		boolean gameSelected = false;
+		while (!gameSelected) {
+			System.out.print("Select a game mode:" + System.lineSeparator() + "\t1 - Default play" + System.lineSeparator() + "\t2 - Custom play" + System.lineSeparator() + "> ");
 			try {
 				mode = sc.nextByte();
 			} catch (InputMismatchException exc) {
@@ -41,14 +37,14 @@ public class CLIView implements View {
 				continue;
 			}
 			switch (mode) {
-			case DEFAULT_PLAY:
+			case 1:
 				try {
 					game = new TicTacToeGame();
 				} catch (InvalidNumberOfPlayersException | InvalidTicTacToeNumberException e) {
 					e.printStackTrace();
 				}
 				break;
-			case CUSTOM_PLAY:
+			case 2:
 				game = getTicTacToeCustomGame();
 				break;
 			default:
@@ -56,16 +52,21 @@ public class CLIView implements View {
 				break;
 			}
 			if (game != null) {
-				break;
+				gameSelected = true;
 			}
 		}
 		return game;
 	}
 
+	/**
+	 * It manages the questions to get the game details.
+	 * 
+	 * @return the custom game.
+	 */
 	private TicTacToeGame getTicTacToeCustomGame() {
 		Player[] players = questionSingleCustomSetup("Do you want a custom players setup?") ? getTicTacToeCustomPlayers() : TicTacToeGame.DEFAULT_PLAYERS;
 		Grid grid = questionSingleCustomSetup("Do you want a custom grid?") ? getTicTacToeCustomGrid() : new Grid();
-		byte ticTacToeNumber = questionSingleCustomSetup("Do you want a custom tic tac toe number?") ? getCustomTicTacToeNumber() : TicTacToeGame.DEFAULT_TIC_TAC_TOE_NUMBER;
+		int ticTacToeNumber = questionSingleCustomSetup("Do you want a custom tic tac toe number?") ? getCustomTicTacToeNumber() : TicTacToeGame.DEFAULT_TIC_TAC_TOE_NUMBER;
 		try {
 			return new TicTacToeGame(players, grid, ticTacToeNumber);
 		} catch (InvalidNumberOfPlayersException | InvalidTicTacToeNumberException exc) {
@@ -74,6 +75,12 @@ public class CLIView implements View {
 		}
 	}
 
+	/**
+	 * It questions to the user if he/she want a specific custom game option.
+	 * 
+	 * @param question the question string
+	 * @return the answer of the user
+	 */
 	private boolean questionSingleCustomSetup(String question) {
 		sc = new Scanner(System.in);
 		while (true) {
@@ -89,32 +96,40 @@ public class CLIView implements View {
 		}
 	}
 
+	/**
+	 * It get from the user the players.
+	 * 
+	 * @return the custom players
+	 */
 	private Player[] getTicTacToeCustomPlayers() {
 		sc = new Scanner(System.in);
 		List<Player> players = new ArrayList<>();
 		String currentPlayerName;
-		while (true) {
-			System.out.println("Enter the players name (the number of player must be from " + TicTacToeGame.MIN_NUMBER_OF_PLAYERS + " to " + TicTacToeGame.MAX_NUMBER_OF_PLAYERS + "):");
-			for (byte i = 0; i < TicTacToeGame.MAX_NUMBER_OF_PLAYERS; i++) {
-				currentPlayerName = sc.nextLine();
-				if ("".equals(currentPlayerName)) {
-					break;
-				}
-				try {
-					players.add(new Player(currentPlayerName));
-				} catch (MaximumPlayerNumberExceededException e) {
-					e.printStackTrace();
-					assert false : "The for statement isn't finish at the right moment.";
-				}
+		System.out.println("Enter the players name (the number of player must be from " + TicTacToeGame.MIN_NUMBER_OF_PLAYERS + " to " + TicTacToeGame.MAX_NUMBER_OF_PLAYERS + "):");
+		for (int i = 0; i < TicTacToeGame.MAX_NUMBER_OF_PLAYERS; i++) {
+			currentPlayerName = sc.nextLine();
+			if ("".equals(currentPlayerName)) {
+				break;
 			}
-			return players.toArray(new Player[players.size()]);
+			try {
+				players.add(new Player(currentPlayerName));
+			} catch (MaximumPlayerNumberExceededException e) {
+				e.printStackTrace();
+				assert false : "The for statement isn't finish at the right moment.";
+			}
 		}
+		return players.toArray(new Player[players.size()]);
 	}
 
+	/**
+	 * It get from the user the dimensions of the custom grid and it instance it.
+	 * 
+	 * @return the custom grid
+	 */
 	private Grid getTicTacToeCustomGrid() {
 		sc = new Scanner(System.in);
-		byte xSize;
-		byte ySize;
+		int xSize;
+		int ySize;
 		while (true) {
 			try {
 			System.out.print("Enter the x size of the grid" + System.lineSeparator() + "> ");
@@ -134,9 +149,14 @@ public class CLIView implements View {
 		}
 	}
 
-	private byte getCustomTicTacToeNumber() {
+	/**
+	 * It get from the user the tic tac toe number.
+	 * 
+	 * @return the custom tic tac toe number
+	 */
+	private int getCustomTicTacToeNumber() {
 		sc = new Scanner(System.in);
-		byte ticTacToeNumber;
+		int ticTacToeNumber;
 		while (true) {
 			try {
 			System.out.print("Enter the tic tac toe number (equal to or greater than " + TicTacToeGame.MIN_TIC_TAC_TOE_NUMBER + ")" + System.lineSeparator() + "> ");
@@ -165,7 +185,7 @@ public class CLIView implements View {
 	@Override
 	public void showGrid(Grid grid) {
 		StringBuilder sb = new StringBuilder();
-		for (byte iRow = 0; iRow < grid.getContent()[0].length; iRow++) {
+		for (int iRow = 0; iRow < grid.getContent()[0].length; iRow++) {
 			sb.append(System.lineSeparator()+ "-" + "----".repeat(grid.getContent().length) + System.lineSeparator() + "| ");
 			for (Pawn[] column : grid.getContent()) {
 				sb.append(((column[iRow] != null) ? column[iRow] : " ") + " | ");
@@ -188,8 +208,8 @@ public class CLIView implements View {
 	@Override
 	public Point getPointNewPawn() {
 		sc = new Scanner(System.in);
-		byte x;
-		byte y;
+		int x;
+		int y;
 		while (true) {
 			try {
 			System.out.print("Enter the x position of the new pawn" + System.lineSeparator() + "> ");

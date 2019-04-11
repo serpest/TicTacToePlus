@@ -8,72 +8,81 @@ import model.exceptions.GridPositionNotExistsException;
 import model.exceptions.GridPositionOccupiedException;
 import view.View;
 
+/**
+ * The TicTacToeController is used to manage the game.
+ */
 public class TicTacToeController {
 
+	/**
+	 * It's the game UI.
+	 */
 	private View ticTacToeView;
-	public View getTicTacToeView() {
-		return ticTacToeView;
-	}
-	public void setTicTacToeView(View ticTacToeView) {
-		this.ticTacToeView = ticTacToeView;
-	}
 
+	/**
+	 * It's the game instance.
+	 */
 	private TicTacToeGame game;
-	public TicTacToeGame getGame() {
-		return game;
-	}
-	public void setGame(TicTacToeGame game) {
-		this.game = game;
-	}
 
 
 
+	/**
+	 * It starts the menu to get the game mode.
+	 */
 	public void initMenu() {
-		setGame(getTicTacToeView().getTicTacToeGame());
+		game = ticTacToeView.getTicTacToeGame();
 	}
 
+	/**
+	 * It starts the game process using the <code>game</code>.
+	 */
 	public void play() {
-		getTicTacToeView().showGameBanner();
+		ticTacToeView.showGameBanner();
 		Player winnerPlayer;
 		Random random = new Random();
-		Player currentPlayer = getGame().getPlayers()[random.nextInt(getGame().getPlayers().length)];
-		while (true) {
-			getTicTacToeView().showGrid(getGame().getGrid());
-			getTicTacToeView().showPlayerTurn(currentPlayer);
-			while (true) {
+		Player currentPlayer = game.getPlayers()[random.nextInt(game.getPlayers().length)];
+		boolean gameOver = false;
+		while (!gameOver) {
+			ticTacToeView.showGrid(game.getGrid());
+			ticTacToeView.showPlayerTurn(currentPlayer);
+			boolean turnFinished = false;
+			while (!turnFinished) {
 				try {
-					getGame().getGrid().addPawn(currentPlayer.getPawn(), getTicTacToeView().getPointNewPawn());
-					break;
+					game.getGrid().addPawn(currentPlayer.getPawn(), ticTacToeView.getPointNewPawn());
+					turnFinished = true;
 				} catch (GridPositionOccupiedException | GridPositionNotExistsException exc) {
 					System.out.println(exc.getMessage());
 				}
 			}
 			//Check tic tac toe
-			winnerPlayer = getGame().getWinner();
+			winnerPlayer = game.getWinner();
 			if (winnerPlayer != null) {
-				getTicTacToeView().showGrid(getGame().getGrid());
-				getTicTacToeView().showWinner(winnerPlayer);
-				break;
+				ticTacToeView.showGrid(game.getGrid());
+				ticTacToeView.showWinner(winnerPlayer);
+				gameOver = true;
 			}
-			if (getGame().getGrid().isFull()) {
-				getTicTacToeView().showGrid(getGame().getGrid());
-				getTicTacToeView().showDraw();
-				break;
+			if (game.getGrid().isFull()) {
+				ticTacToeView.showGrid(game.getGrid());
+				ticTacToeView.showDraw();
+				gameOver = true;
 			}
 			//Next turn
-			if (currentPlayer.getN() == getGame().getPlayers().length - 1) {
-				currentPlayer = getGame().getPlayers()[0];
+			if (currentPlayer.getSerialNumber() == game.getPlayers().length - 1) {
+				currentPlayer = game.getPlayers()[0];
 			}
 			else {
-				currentPlayer = getGame().getPlayers()[currentPlayer.getN() + 1];
+				currentPlayer = game.getPlayers()[currentPlayer.getSerialNumber() + 1];
 			}
 		}
 	}
 
 
 
-	public TicTacToeController(View ticTacToeView) {
-		setTicTacToeView(ticTacToeView);
+	/**
+	 * @param ticTacToeView the UI to use
+	 */
+	public TicTacToeController(final View ticTacToeView) {
+		this.ticTacToeView = ticTacToeView;
+		game = ticTacToeView.getTicTacToeGame();
 	}
 
 }

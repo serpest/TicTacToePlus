@@ -2,22 +2,38 @@ package model;
 
 import model.exceptions.MaximumPlayerNumberExceededException;
 
+/**
+ * It's an simple tic tac toe player.
+ */
 public class Player {
 
+	/**
+	 * it's the root word of the default players.
+	 */
 	private static final String DEFAULT_NAME = "Player";
 
-	private static byte nPlayers = 0;
+	/**
+	 * It's the current serial number.
+	 */
+	private static int nPlayers = 0;
 
 
 
-	private byte n;
-	public byte getN() {
-		return n;
+	/**
+	 * It's the serial number of the player generated when the player was created.
+	 * It's used from the controller to change the player turn.
+	 */
+	private int serialNumber;
+	public int getSerialNumber() {
+		return serialNumber;
 	}
-	private void setN(byte n) {
-		this.n = n;
+	private void setSerialNumber(int n) {
+		this.serialNumber = n;
 	}
 
+	/**
+	 * It's the player's name.
+	 */
 	private String name;
 	public String getName() {
 		return name;
@@ -39,9 +55,15 @@ public class Player {
 
 
 
+	/**
+	 * It creates a player with a custom name, but a fixed pawn.
+	 * 
+	 * @param name the player's name
+	 * @throws MaximumPlayerNumberExceededException if the players are too many for the pawn fixed values
+	 */
 	public Player(String name) throws MaximumPlayerNumberExceededException {
 		setName(name);
-		setN(nPlayers);
+		setSerialNumber(nPlayers);
 		try {
 			setPawn(Pawn.values()[nPlayers]);
 		} catch (ArrayIndexOutOfBoundsException exc) {
@@ -54,9 +76,9 @@ public class Player {
 	 * 
 	 * @param nPLayer the number of the player (from 0)
 	 */
-	Player(byte nPLayer) {
+	Player(int nPLayer) {
 		setName(DEFAULT_NAME + (nPLayer + 1));
-		setN(nPLayer);
+		setSerialNumber(nPLayer);
 		setPawn(Pawn.values()[nPLayer]);
 	}
 
