@@ -2,7 +2,7 @@ package model.exceptions;
 
 import model.Point;
 
-public class GridPositionNotExistsException extends Exception {
+public class GridPositionNotExistsException extends RuntimeException {
 
 	private static final long serialVersionUID = 816326998914811391L;
 

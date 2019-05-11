@@ -44,7 +44,7 @@ public class TicTacToeGame {
 	/**
 	 * The tic tac toe checker.
 	 */
-	private final TicTacToeChecker CHECKER;
+	private final TicTacToeMainChecker CHECKER;
 
 	/**
 	 * It's the array of the players.
@@ -88,10 +88,11 @@ public class TicTacToeGame {
 
 
 	/**
+	 * @param examinedPawn the examined pawn
 	 * @return the player winner or null using <code>CHECKER</code>.
 	 */
-	public Player getWinner() {
-		Pawn winnerPawn = CHECKER.checkTicTacToe(getGrid().getContent());
+	public Player getWinner(Pawn examinedPawn) {
+		Pawn winnerPawn = CHECKER.checkTicTacToe(examinedPawn);
 		if (winnerPawn == null) {
 			return null;
 		}
@@ -133,7 +134,7 @@ public class TicTacToeGame {
 		setGrid(grid);
 		MAX_TIC_TAC_TOE_NUMBER = Integer.max(getGrid().getContent().length, getGrid().getContent()[0].length);
 		setTicTacToeNumber(ticTacToeNumber);
-		CHECKER = new TicTacToeChecker(getTicTacToeNumber());
+		CHECKER = new TicTacToeMainChecker(this);
 	}
 
 }

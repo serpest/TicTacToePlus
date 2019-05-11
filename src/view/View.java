@@ -16,6 +16,8 @@ public interface View {
 	
 	/**
 	 * It shows the grid.
+	 * 
+	 * @param grid the grid
 	 */
 	void showGrid(Grid grid);
 	
@@ -28,6 +30,8 @@ public interface View {
 	
 	/**
 	 * It shows the winner player.
+	 * 
+	 * @param player the player
 	 */
 	void showWinner(Player player);
 	

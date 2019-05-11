@@ -67,8 +67,6 @@ public class Grid {
 	}
 
 	/**
-	 * It launches an exception if the point ins't inside the grid.
-	 * 
 	 * @param point the point of the grid
 	 * @throws GridPositionNotExistsException if the point ins't inside the grid
 	 */

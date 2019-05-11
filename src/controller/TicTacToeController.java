@@ -14,12 +14,12 @@ import view.View;
 public class TicTacToeController {
 
 	/**
-	 * It's the game UI.
+	 * The game UI.
 	 */
 	private View ticTacToeView;
 
 	/**
-	 * It's the game instance.
+	 * The game instance.
 	 */
 	private TicTacToeGame game;
 
@@ -54,7 +54,7 @@ public class TicTacToeController {
 				}
 			}
 			//Check tic tac toe
-			winnerPlayer = game.getWinner();
+			winnerPlayer = game.getWinner(currentPlayer.getPawn());
 			if (winnerPlayer != null) {
 				ticTacToeView.showGrid(game.getGrid());
 				ticTacToeView.showWinner(winnerPlayer);
