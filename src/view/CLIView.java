@@ -5,15 +5,15 @@ import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
-import model.Grid;
-import model.Pawn;
-import model.Player;
-import model.Point;
+import model.components.Grid;
+import model.components.Pawn;
+import model.base.Point;
 import model.TicTacToeGame;
 import model.exceptions.GridSizeException;
 import model.exceptions.InvalidNumberOfPlayersException;
 import model.exceptions.InvalidTicTacToeNumberException;
 import model.exceptions.MaximumPlayerNumberExceededException;
+import model.players.Player;
 
 public class CLIView implements View {
 
@@ -28,7 +28,7 @@ public class CLIView implements View {
 		int mode;
 		boolean gameSelected = false;
 		while (!gameSelected) {
-			System.out.print("Select a game mode:" + System.lineSeparator() + "\t1 - Default play" + System.lineSeparator() + "\t2 - Custom play" + System.lineSeparator() + "> ");
+			System.out.print("Select a game mode:" + System.lineSeparator() + "\t1 - Default multiplayer" + System.lineSeparator() + "\t2 - Custom multiplayer" + System.lineSeparator() + "\t3 - Default single-player" + System.lineSeparator() + "> ");
 			try {
 				mode = sc.nextByte();
 			} catch (InputMismatchException exc) {
@@ -38,14 +38,50 @@ public class CLIView implements View {
 			}
 			switch (mode) {
 			case 1:
-				try {
-					game = new TicTacToeGame();
-				} catch (InvalidNumberOfPlayersException | InvalidTicTacToeNumberException e) {
-					e.printStackTrace();
-				}
+				game = new TicTacToeGame();
 				break;
 			case 2:
 				game = getTicTacToeCustomGame();
+				break;
+			case 3:
+				game = getTicTacToeSingleGame();
+				break;
+			default:
+				System.out.println("Number not valid");
+				break;
+			}
+			if (game != null) {
+				gameSelected = true;
+			}
+		}
+		return game;
+	}
+
+	/**
+	 * It asks the difficult level the user and it returns the game.
+	 * 
+	 * @return the single game.
+	 */
+	private TicTacToeGame getTicTacToeSingleGame() {
+		sc = new Scanner(System.in);
+		TicTacToeGame game = null;
+		int mode;
+		boolean gameSelected = false;
+		while (!gameSelected) {
+			System.out.print("Select a difficult level:" + System.lineSeparator() + "\t1 - Normal" + System.lineSeparator() + "\t2 - Legend (you can't win)" + System.lineSeparator() + "> ");
+			try {
+				mode = sc.nextByte();
+			} catch (InputMismatchException exc) {
+				System.out.println("Enter a number");
+				sc.next();
+				continue;
+			}
+			switch (mode) {
+			case 1:
+				game = new TicTacToeGame(TicTacToeGame.SINGLE_PLAYER_MODE.NORMAL);
+				break;
+			case 2:
+				game = new TicTacToeGame(TicTacToeGame.SINGLE_PLAYER_MODE.LEGEND);
 				break;
 			default:
 				System.out.println("Number not valid");
@@ -70,7 +106,7 @@ public class CLIView implements View {
 		try {
 			return new TicTacToeGame(players, grid, ticTacToeNumber);
 		} catch (InvalidNumberOfPlayersException | InvalidTicTacToeNumberException exc) {
-			System.out.println(exc.getMessage());
+			assert false;
 			return getTicTacToeCustomGame();
 		}
 	}

@@ -1,9 +1,9 @@
 package view;
 
-import model.Grid;
-import model.Player;
-import model.Point;
+import model.components.Grid;
+import model.base.Point;
 import model.TicTacToeGame;
+import model.players.Player;
 
 public interface View {
 

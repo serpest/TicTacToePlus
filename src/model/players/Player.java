@@ -1,5 +1,6 @@
-package model;
+package model.players;
 
+import model.components.Pawn;
 import model.exceptions.MaximumPlayerNumberExceededException;
 
 /**
@@ -71,12 +72,14 @@ public class Player {
 		}
 		nPlayers += 1;
 	}
+
 	/**
+	 * It creates a player with default name and pawn.
 	 * It is used in the creation of TicTacToeGame.DEFAULT_PLAYERS and it doesn't throw MaximumPlayerNumberExceededException.
 	 * 
 	 * @param nPLayer the number of the player (from 0)
 	 */
-	Player(int nPLayer) {
+	public Player(int nPLayer) {
 		setName(DEFAULT_NAME + (nPLayer + 1));
 		setSerialNumber(nPLayer);
 		setPawn(Pawn.values()[nPLayer]);

@@ -1,6 +1,6 @@
 package model.exceptions;
 
-import model.Point;
+import model.base.Point;
 
 public class GridPositionNotExistsException extends RuntimeException {
 

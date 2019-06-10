@@ -1,6 +1,6 @@
 package model.exceptions;
 
-public class MaximumPlayerNumberExceededException extends Exception {
+public class MaximumPlayerNumberExceededException extends RuntimeException {
 
 	private static final long serialVersionUID = 4459554044361936317L;
 

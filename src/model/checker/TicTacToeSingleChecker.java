@@ -1,8 +1,12 @@
-package model;
+package model.checker;
 
-class TicTacToeSingleChecker implements Runnable {
+import model.components.Pawn;
 
-	private Thread thread;
+import java.util.concurrent.Callable;
+
+import model.base.Point;
+
+class TicTacToeSingleChecker implements Callable<Pawn> {
 
 	/**
 	 * The main checker that creates this single checker.
@@ -55,42 +59,17 @@ class TicTacToeSingleChecker implements Runnable {
 	private int generateCHECKS_NUMBER(Mode mode) {
 		switch (mode) {
 		case COLUMNS:
+			return MAIN_CHECKER.getGrid().getContent().length;
 		case HIGH_DIAGONALS:
-			return MAIN_CHECKER.getGame().getGrid().getContent().length - MAIN_CHECKER.getGame().getTicTacToeNumber() + 1;
+			return MAIN_CHECKER.getGrid().getContent().length - MAIN_CHECKER.getTIC_TAC_TOE_NUMBER() + 1;
 		case ROWS:
+			return MAIN_CHECKER.getGrid().getContent()[0].length;
 		case LOW_DIAGONALS:
-			return MAIN_CHECKER.getGame().getGrid().getContent()[0].length - MAIN_CHECKER.getGame().getTicTacToeNumber() + 1;
+			return MAIN_CHECKER.getGrid().getContent()[0].length - MAIN_CHECKER.getTIC_TAC_TOE_NUMBER() + 1;
 		default:
 			assert false;
 			return -1;
 		}
-	}
-
-	/**
-	 * It checks the lines selected using the details created by <code>initCheckDetails()</code> in the constructor.
-	 */
-	@Override
-	public void run() {
-		Pawn winnerPawn;
-		for (int i = 0; i < CHECKS_NUMBER; i++) {
-			if (MAIN_CHECKER.isResultFound()) {
-				return;
-			}
-			winnerPawn = CHECK_METHOD.get(i);
-			if (winnerPawn != null) {
-				MAIN_CHECKER.setResult(winnerPawn);
-				return;
-			}
-		}
-		MAIN_CHECKER.addFailedSearchingAttempt();
-		return;
-	}
-
-	/**
-	 * It starts the thread already created.
-	 */
-	public void startThread() {
-		thread.start();
 	}
 
 	/**
@@ -100,7 +79,7 @@ class TicTacToeSingleChecker implements Runnable {
 	 * @return the winner pawn or null
 	 */
 	private Pawn checkRowTicTacToe(final int iRow) {
-		return checkLineTicTacToe(MAIN_CHECKER.getGame().getGrid().getContent().length, (i)->MAIN_CHECKER.getGame().getGrid().getContent()[i][iRow]);
+		return checkLineTicTacToe(MAIN_CHECKER.getGrid().getContent().length, (i)->MAIN_CHECKER.getGrid().getContent()[i][iRow]);
 	}
 
 	/**
@@ -110,7 +89,7 @@ class TicTacToeSingleChecker implements Runnable {
 	 * @return the winner pawn or null
 	 */
 	private Pawn checkColumnTicTacToe(final int iColumn) {
-		return checkLineTicTacToe(MAIN_CHECKER.getGame().getGrid().getContent()[0].length, (i)->MAIN_CHECKER.getGame().getGrid().getContent()[iColumn][i]);
+		return checkLineTicTacToe(MAIN_CHECKER.getGrid().getContent()[0].length, (i)->MAIN_CHECKER.getGrid().getContent()[iColumn][i]);
 	}
 
 	/**
@@ -122,10 +101,10 @@ class TicTacToeSingleChecker implements Runnable {
 	private Pawn checkDiagonalTicTacToe(final Point firstPoint) {
 		boolean mainPointIsX = firstPoint.getX() >= firstPoint.getY();
 		int mainPointDimension = Integer.max(firstPoint.getX(), firstPoint.getY());
-		int minGridSize = Integer.min(MAIN_CHECKER.getGame().getGrid().getContent().length, MAIN_CHECKER.getGame().getGrid().getContent()[0].length);
-		int maxGridSize = Integer.max(MAIN_CHECKER.getGame().getGrid().getContent().length, MAIN_CHECKER.getGame().getGrid().getContent()[0].length);
+		int minGridSize = Integer.min(MAIN_CHECKER.getGrid().getContent().length, MAIN_CHECKER.getGrid().getContent()[0].length);
+		int maxGridSize = Integer.max(MAIN_CHECKER.getGrid().getContent().length, MAIN_CHECKER.getGrid().getContent()[0].length);
 		int lineSize = minGridSize - mainPointDimension; //The line size calculated for axes x=y
-		if ((MAIN_CHECKER.getGame().getGrid().getContent().length > MAIN_CHECKER.getGame().getGrid().getContent()[0].length && mainPointIsX) || (MAIN_CHECKER.getGame().getGrid().getContent().length < MAIN_CHECKER.getGame().getGrid().getContent()[0].length && !mainPointIsX)) { //The main point axis is greater than the minimum axis
+		if ((MAIN_CHECKER.getGrid().getContent().length > MAIN_CHECKER.getGrid().getContent()[0].length && mainPointIsX) || (MAIN_CHECKER.getGrid().getContent().length < MAIN_CHECKER.getGrid().getContent()[0].length && !mainPointIsX)) { //The main point axis is greater than the minimum axis
 			if (mainPointDimension < maxGridSize - (minGridSize - 1)) { //The main point is before the square grid where axes x = y
 				lineSize = minGridSize;
 			}
@@ -133,8 +112,8 @@ class TicTacToeSingleChecker implements Runnable {
 				lineSize += maxGridSize - minGridSize;
 			}
 		}
-		Pawn toRightResult = checkLineTicTacToe(lineSize, (i)->MAIN_CHECKER.getGame().getGrid().getContent()[firstPoint.getX() + i][firstPoint.getY() + i]);
-		Pawn toLeftResult = checkLineTicTacToe(lineSize, (i)->MAIN_CHECKER.getGame().getGrid().getContent()[(MAIN_CHECKER.getGame().getGrid().getContent().length - 1) - firstPoint.getX() - i][firstPoint.getY() + i]);
+		Pawn toRightResult = checkLineTicTacToe(lineSize, (i)->MAIN_CHECKER.getGrid().getContent()[firstPoint.getX() + i][firstPoint.getY() + i]);
+		Pawn toLeftResult = checkLineTicTacToe(lineSize, (i)->MAIN_CHECKER.getGrid().getContent()[(MAIN_CHECKER.getGrid().getContent().length - 1) - firstPoint.getX() - i][firstPoint.getY() + i]);
 		return (toRightResult != null) ? toRightResult : toLeftResult;
 	}
 
@@ -150,17 +129,17 @@ class TicTacToeSingleChecker implements Runnable {
 	private Pawn checkLineTicTacToe(final int lineSize, final Selector selector) {
 		Pawn currentMainPawn;
 		Pawn currentExaminedPawn;
-		for (int i = 0; i <= lineSize - MAIN_CHECKER.getGame().getTicTacToeNumber(); i++) {
+		for (int i = 0; i <= lineSize - MAIN_CHECKER.getTIC_TAC_TOE_NUMBER(); i++) {
 			currentMainPawn = selector.get(i);
 			if (currentMainPawn == null || !currentMainPawn.equals(MAIN_CHECKER.getExaminedPawn())) {
 				continue;
 			}
-			for (int j = 1; j < MAIN_CHECKER.getGame().getTicTacToeNumber(); j++) {
+			for (int j = 1; j < MAIN_CHECKER.getTIC_TAC_TOE_NUMBER(); j++) {
 				currentExaminedPawn = selector.get(i + j);
 				if (currentExaminedPawn == null || !currentMainPawn.equals(currentExaminedPawn)) {
 					break;
 				}
-				if (j == MAIN_CHECKER.getGame().getTicTacToeNumber() - 1) {
+				if (j == MAIN_CHECKER.getTIC_TAC_TOE_NUMBER() - 1) {
 					return currentMainPawn;
 				}
 			}	 
@@ -177,8 +156,6 @@ class TicTacToeSingleChecker implements Runnable {
 	 * @param mode the mode of the checker
 	 */
 	public TicTacToeSingleChecker(final TicTacToeMainChecker MAIN_CHECKER, Mode mode) {
-		thread = new Thread(this, "TicTacToeSingleChecker");
-		thread.setPriority(Thread.NORM_PRIORITY);
 		this.MAIN_CHECKER = MAIN_CHECKER;
 		CHECK_METHOD = generateCHECK_METHOD(mode);
 		CHECKS_NUMBER = generateCHECKS_NUMBER(mode);
@@ -187,10 +164,33 @@ class TicTacToeSingleChecker implements Runnable {
 
 
 	/**
+	 * It checks the lines selected using the details created by <code>initCheckDetails()</code> in the constructor and it returns the result.
+	 */
+	@Override
+	public Pawn call() {
+		Pawn winnerPawn = null;
+		for (int i = 0; i < CHECKS_NUMBER; i++) {
+			if (MAIN_CHECKER.isResultFound()) {
+				return null;
+			}
+			winnerPawn = CHECK_METHOD.get(i);
+			if (winnerPawn != null) {
+				MAIN_CHECKER.setResultFound(true);
+				break;
+			}
+		}
+		return winnerPawn;
+	}
+
+
+
+	/**
 	 * It determines the single checker mode.
 	 */
 	static enum Mode {
+
 		COLUMNS, ROWS, HIGH_DIAGONALS /*The main diagonal and the ones above*/, LOW_DIAGONALS /*The main diagonal and the ones below*/;
+
 	}
 
 	/**
@@ -200,11 +200,13 @@ class TicTacToeSingleChecker implements Runnable {
 	 */
 	@FunctionalInterface
 	private interface Selector {
+
 		/**
 		 * @param i the index
 		 * @return a <code>Pawn</code>
 		 */
 		Pawn get(int i);
+
 	}
 
 }

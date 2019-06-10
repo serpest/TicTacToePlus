@@ -1,5 +1,6 @@
-package model;
+package model.components;
 
+import model.base.Point;
 import model.exceptions.GridPositionNotExistsException;
 import model.exceptions.GridPositionOccupiedException;
 import model.exceptions.GridSizeException;
@@ -7,7 +8,7 @@ import model.exceptions.GridSizeException;
 /**
  * It's a tic tac toe grid with default or custom sizes.
  */
-public class Grid {
+public class Grid implements Cloneable {
 
 	/**
 	 * Minimum one size must be greater than or equal to this.
@@ -50,9 +51,7 @@ public class Grid {
 	 */
 	public void addPawn(Pawn pawn, Point point) throws GridPositionOccupiedException, GridPositionNotExistsException {
 		checkPositionExistenceInGrid(point);
-		if (getContent()[point.getX()][point.getY()] != null) {
-			throw new GridPositionOccupiedException(point);
-		}
+		checkPointOccupied(point);
 		getContent()[point.getX()][point.getY()] = pawn;
 	}
 
@@ -77,7 +76,7 @@ public class Grid {
 	}
 
 	/**
-	 * @return the grid is full
+	 * @return the grid is full?
 	 */
 	public boolean isFull() {
 		for (Pawn[] pawns : getContent()) {
@@ -90,6 +89,44 @@ public class Grid {
 		return true;
 	}
 
+	/**
+	 * @return the grid is empty?
+	 */
+	public boolean isEmpty() {
+		for (Pawn[] pawns : getContent()) {
+			for (Pawn pawn : pawns) {
+				if (pawn != null) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * It check the correction of the grid size.
+	 * It is used from the constructor to verify the parameters.
+	 * 
+	 * @param xSize the size of y
+	 * @param ySize the size of y
+	 * @return grid dimensions are correct?
+	 */
+	private boolean areGridDimensionsCorrect(final int xSize, final int ySize) {
+		return (xSize >= MIN_SIZE && ySize > 0) || (ySize >= MIN_SIZE && xSize > 0);
+	}
+
+	/**
+	 * It throws an exception if the parameter point is already occupied in the grid.
+	 * 
+	 * @param point the point
+	 * @throws GridPositionNotExistsException if the point ins't inside the grid
+	 */
+	private void checkPointOccupied(Point point) throws GridPositionOccupiedException {
+		if (getContent()[point.getX()][point.getY()] != null) {
+			throw new GridPositionOccupiedException(point);
+		}
+	}
+
 
 
 	/**
@@ -98,6 +135,7 @@ public class Grid {
 	public Grid() {
 		setContent(new Pawn[DEFAULT_X_SIZE][DEFAULT_Y_SIZE]);
 	}
+
 	/**
 	 * It creates a custom grid.
 	 * 
@@ -106,11 +144,30 @@ public class Grid {
 	 * @throws GridSizeException if the grid size isn't accepted.
 	 */
 	public Grid(final int xSize, final int ySize) throws GridSizeException {
-		if ((xSize >= MIN_SIZE && ySize > 0) || (ySize >= MIN_SIZE && xSize > 0)) {
+		if (areGridDimensionsCorrect(xSize, ySize)) {
 			setContent(new Pawn[xSize][ySize]);
 			return;
 		}
 		throw new GridSizeException();
+	}
+
+
+
+	@Override
+	public Grid clone() {
+		//Deep copy
+		try {
+			Grid clonedGrid = (Grid) super.clone();
+			Pawn[][] clonedGridContent = getContent().clone();
+			for (byte i = 0; i < getContent().length; i++) {
+				clonedGridContent[i] = clonedGridContent[i].clone();
+			}
+			clonedGrid.setContent(clonedGridContent);
+			return clonedGrid;
+		} catch (CloneNotSupportedException exc) {
+			exc.printStackTrace();
+		}
+		return null;
 	}
 
 }

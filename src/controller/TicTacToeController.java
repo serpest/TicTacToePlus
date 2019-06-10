@@ -2,10 +2,11 @@ package controller;
 
 import java.util.Random;
 
-import model.Player;
 import model.TicTacToeGame;
 import model.exceptions.GridPositionNotExistsException;
 import model.exceptions.GridPositionOccupiedException;
+import model.players.Player;
+import model.players.VirtualPlayer;
 import view.View;
 
 /**
@@ -23,27 +24,42 @@ public class TicTacToeController {
 	 */
 	private TicTacToeGame game;
 
+	/**
+	 * The game is over?
+	 */
+	private boolean gameOver = false;
+
+	/**
+	 * The current player in the game.
+	 */
+	private Player currentPlayer;
 
 
 	/**
 	 * It starts the menu to get the game mode.
 	 */
 	public void initMenu() {
+		ticTacToeView.showGameBanner();
 		game = ticTacToeView.getTicTacToeGame();
 	}
 
 	/**
-	 * It starts the game process using the <code>game</code>.
+	 * It setups the first player randomly.
 	 */
-	public void play() {
-		ticTacToeView.showGameBanner();
-		Player winnerPlayer;
-		Random random = new Random();
-		Player currentPlayer = game.getPlayers()[random.nextInt(game.getPlayers().length)];
-		boolean gameOver = false;
-		while (!gameOver) {
-			ticTacToeView.showGrid(game.getGrid());
-			ticTacToeView.showPlayerTurn(currentPlayer);
+	private void setUpPlayers() {
+		currentPlayer = game.getPlayers()[new Random().nextInt(game.getPlayers().length)];
+	}
+
+	/**
+	 * It manages a player turn.
+	 */
+	private void placePlayerTile() {
+		ticTacToeView.showGrid(game.getGrid());
+		ticTacToeView.showPlayerTurn(currentPlayer);
+		if (currentPlayer instanceof VirtualPlayer) {
+			game.getGrid().addPawn(currentPlayer.getPawn(), ((VirtualPlayer) currentPlayer).getNewPawnPoint());
+		}
+		else {
 			boolean turnFinished = false;
 			while (!turnFinished) {
 				try {
@@ -53,25 +69,54 @@ public class TicTacToeController {
 					System.out.println(exc.getMessage());
 				}
 			}
-			//Check tic tac toe
-			winnerPlayer = game.getWinner(currentPlayer.getPawn());
-			if (winnerPlayer != null) {
-				ticTacToeView.showGrid(game.getGrid());
-				ticTacToeView.showWinner(winnerPlayer);
-				gameOver = true;
-			}
-			if (game.getGrid().isFull()) {
-				ticTacToeView.showGrid(game.getGrid());
-				ticTacToeView.showDraw();
-				gameOver = true;
-			}
-			//Next turn
-			if (currentPlayer.getSerialNumber() == game.getPlayers().length - 1) {
-				currentPlayer = game.getPlayers()[0];
-			}
-			else {
-				currentPlayer = game.getPlayers()[currentPlayer.getSerialNumber() + 1];
-			}
+		}
+	}
+
+	/**
+	 * It terminates the game with a winner result if someone win the game.
+	 */
+	private void checkTicTacToe() {
+		Player winnerPlayer = game.getWinner(currentPlayer.getPawn());
+		if (winnerPlayer != null) {
+			ticTacToeView.showGrid(game.getGrid());
+			ticTacToeView.showWinner(winnerPlayer);
+			gameOver = true;
+		}
+	}
+
+	/**
+	 * It terminates the game with a draw result if the grid is full.
+	 */
+	private void checkDraw() {
+		if (game.getGrid().isFull()) {
+			ticTacToeView.showGrid(game.getGrid());
+			ticTacToeView.showDraw();
+			gameOver = true;
+		}
+	}
+
+	/**
+	 * It changes the <code>currentPlayer</code> for the next turn.
+	 */
+	private void changePlayer() {
+		if (currentPlayer.getSerialNumber() == game.getPlayers().length - 1) {
+			currentPlayer = game.getPlayers()[0];
+		}
+		else {
+			currentPlayer = game.getPlayers()[currentPlayer.getSerialNumber() + 1];
+		}
+	}
+
+	/**
+	 * It starts the game process using the <code>game</code>.
+	 */
+	public void play() {
+		setUpPlayers();
+		while (!gameOver) {
+			placePlayerTile();
+			checkTicTacToe();
+			checkDraw();
+			changePlayer();
 		}
 	}
 

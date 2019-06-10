@@ -1,6 +1,6 @@
 package model.exceptions;
 
-public class InvalidTicTacToeNumberException extends Exception {
+public class InvalidTicTacToeNumberException extends RuntimeException {
 
 	private static final long serialVersionUID = 4962762730091672890L;
 

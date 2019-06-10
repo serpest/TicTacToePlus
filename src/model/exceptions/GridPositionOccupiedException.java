@@ -1,8 +1,8 @@
 package model.exceptions;
 
-import model.Point;
+import model.base.Point;
 
-public class GridPositionOccupiedException extends Exception {
+public class GridPositionOccupiedException extends RuntimeException {
 
 	private static final long serialVersionUID = -628130045077406292L;
 

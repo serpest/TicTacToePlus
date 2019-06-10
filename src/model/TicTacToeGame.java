@@ -1,7 +1,13 @@
 package model;
 
+import model.checker.TicTacToeMainChecker;
+import model.components.Grid;
+import model.components.Pawn;
 import model.exceptions.InvalidNumberOfPlayersException;
 import model.exceptions.InvalidTicTacToeNumberException;
+import model.players.NormalVirtualPlayer;
+import model.players.PerfectVirtualPlayer;
+import model.players.Player;
 
 /**
  * It's the integration of the objects used in the game.
@@ -92,24 +98,51 @@ public class TicTacToeGame {
 	 * @return the player winner or null using <code>CHECKER</code>.
 	 */
 	public Player getWinner(Pawn examinedPawn) {
-		Pawn winnerPawn = CHECKER.checkTicTacToe(examinedPawn);
+		Pawn winnerPawn = CHECKER.checkTicTacToe(getGrid(), examinedPawn);
 		if (winnerPawn == null) {
 			return null;
 		}
 		return getPlayers()[winnerPawn.ordinal()];
 	}
 
+	/**
+	 * It initializes a <code>VirtualPlayer</code>. It is the second player in the array.
+	 * 
+	 * @param mode the <code>VirtualPlayer</code> level
+	 */
+	private void initVirtualPlayer(SINGLE_PLAYER_MODE mode) {
+		switch (mode) {
+		case LEGEND:
+			players[1] = new PerfectVirtualPlayer(1, this);
+			break;
+		case NORMAL:
+			players[1] = new NormalVirtualPlayer(1, this, Pawn.values()[0]);
+			break;
+		default:
+			assert false;
+			break;
+		}
+	}
 
+
+
+	/**
+	 * It creates a default single-player game.
+	 */
+	public TicTacToeGame() {
+		this(DEFAULT_PLAYERS);
+	}
 
 	/**
 	 * It's the default game constructor.
 	 * 
-	 * @throws InvalidNumberOfPlayersException if the number of the players isn't accepted
-	 * @throws InvalidTicTacToeNumberException if the tic tac toe number isn't accepted
+	 * @param mode the <code>VirtualPlayer</code> level
 	 */
-	public TicTacToeGame() throws InvalidNumberOfPlayersException, InvalidTicTacToeNumberException {
+	public TicTacToeGame(SINGLE_PLAYER_MODE mode) {
 		this(DEFAULT_PLAYERS);
+		initVirtualPlayer(mode);
 	}
+
 	/**
 	 * It's a custom game constructor.
 	 * 
@@ -120,6 +153,7 @@ public class TicTacToeGame {
 	public TicTacToeGame(Player[] players) throws InvalidNumberOfPlayersException, InvalidTicTacToeNumberException {
 		this(players, new Grid(), DEFAULT_TIC_TAC_TOE_NUMBER);
 	}
+
 	/**
 	 * It's a custom game constructor.
 	 * 
@@ -134,7 +168,18 @@ public class TicTacToeGame {
 		setGrid(grid);
 		MAX_TIC_TAC_TOE_NUMBER = Integer.max(getGrid().getContent().length, getGrid().getContent()[0].length);
 		setTicTacToeNumber(ticTacToeNumber);
-		CHECKER = new TicTacToeMainChecker(this);
+		CHECKER = new TicTacToeMainChecker(getTicTacToeNumber());
+	}
+
+
+
+	/**
+	 * The single-player mode used to determinate the <code>VirtualPlayer</code>.
+	 */
+	public enum SINGLE_PLAYER_MODE {
+
+		NORMAL, LEGEND;
+
 	}
 
 }

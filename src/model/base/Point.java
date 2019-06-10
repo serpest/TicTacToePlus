@@ -1,4 +1,4 @@
-package model;
+package model.base;
 
 /**
  * It's a simple point P(x, y).
