@@ -1,7 +1,7 @@
 package model.components;
 
 /**
- * It's the pawn positioned in the grid. It can have only fixed values.
+ * The pawn positioned in the grid. It can have only fixed values.
  */
 public enum Pawn {
 

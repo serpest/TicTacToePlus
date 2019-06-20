@@ -22,7 +22,6 @@ public class PerfectVirtualPlayer extends VirtualPlayer {
 	/**
 	 * The new point for all the configurations.
 	 * VirtualPlayer is "X" and the opponent is "O".
-	 * There are 272 values, so I'll move it to a text file.
 	 */
 	private static final Map<String, Point> PERFECT_POINTS = new HashMap<>() {
 
@@ -327,7 +326,52 @@ public class PerfectVirtualPlayer extends VirtualPlayer {
 
 
 	/**
-	 * It update the <code>currentRotatedGrid</code> using the game grid and the <code>rotateValue<code>.
+	 * It creates a player with a custom name, but a fixed pawn.
+	 * It works only if the grid size is 3x3 and the players are 2.
+	 * 
+	 * @param name the player's name
+	 * @param game the <code>TicTacToeGame</code> instance 
+	 * @throws MaximumPlayerNumberExceededException if the players are too many for the pawn fixed values
+	 * @throws GridSizeException if the size of the grid isn't 3x3 
+	 * @throws InvalidNumberOfPlayersException if the players aren't 2
+	 */
+	public PerfectVirtualPlayer(String name, TicTacToeGame game) throws MaximumPlayerNumberExceededException, GridSizeException, InvalidNumberOfPlayersException {
+		super(name);
+		setGame(game);
+	}
+
+	/**
+	 * It creates a player with default name and pawn.
+	 * It works only if the grid size is 3x3 and the players are 2.
+	 * 
+	 * @param nPLayer the number of the player (from 0)
+	 * @param game the <code>TicTacToeGame</code> instance 
+	 * @throws MaximumPlayerNumberExceededException if the players are too many for the pawn fixed values
+	 * @throws GridSizeException if the size of the grid isn't 3x3 
+	 * @throws InvalidNumberOfPlayersException if the players aren't 2
+	 */
+	public PerfectVirtualPlayer(int nPLayer, TicTacToeGame game) throws MaximumPlayerNumberExceededException, GridSizeException, InvalidNumberOfPlayersException {
+		super(nPLayer);
+		setGame(game);
+	}
+
+
+
+	@Override
+	public Point getNewPawnPoint() {
+		if (rotateValue == -1) {
+			createRotateValue();
+		}
+		updateCurrentRotatedGrid();
+		Point currentRotatedGridNewPoint = PERFECT_POINTS.get(gridToString(currentRotatedGrid));
+		assert currentRotatedGridNewPoint != null : "Situation (" + gridToString(currentRotatedGrid) + ") not provided by PERFECT_POINTS.";
+		return getOriginalPointFromCurrentRotatedGridPoint(currentRotatedGridNewPoint);
+	}
+
+
+
+	/**
+	 * It updates the <code>currentRotatedGrid</code> using the game grid and the <code>rotateValue<code>.
 	 */
 	private void updateCurrentRotatedGrid() {
 		if (rotateValue == 0) { //Fast method
@@ -400,7 +444,7 @@ public class PerfectVirtualPlayer extends VirtualPlayer {
 		}
 		else {
 			final Point[] BOTTOM_POINTS = {new Point(0, 0), new Point(0, 2), new Point(2, 2), new Point(2, 0)};
-			final Point[] LATERAL_POINTS = {new Point(0, 1), new Point(0, 1), new Point(2, 1), new Point(2, 1)};
+			final Point[] LATERAL_POINTS = {new Point(0, 1), new Point(1, 2), new Point(2, 1), new Point(1, 0)};
 			createRotateValueFromOccupiedGrid(BOTTOM_POINTS);
 			createRotateValueFromOccupiedGrid(LATERAL_POINTS);
 		}
@@ -428,7 +472,7 @@ public class PerfectVirtualPlayer extends VirtualPlayer {
 	 * @param grid the grid
 	 * @return a simple grid representation
 	 */
-	public String gridToString(Grid grid) {
+	private String gridToString(Grid grid) {
 		StringBuilder sb = new StringBuilder();
 		Pawn currentPawn;
 		for (byte iRow = 0; iRow < grid.getContent()[0].length; iRow++) {
@@ -438,51 +482,6 @@ public class PerfectVirtualPlayer extends VirtualPlayer {
 			}
 		}
 		return sb.toString();
-	}
-
-
-
-	/**
-	 * It creates a player with a custom name, but a fixed pawn.
-	 * It works only if the grid size is 3x3 and the players are 2.
-	 * 
-	 * @param name the player's name
-	 * @param game the <code>TicTacToeGame</code> instance 
-	 * @throws MaximumPlayerNumberExceededException if the players are too many for the pawn fixed values
-	 * @throws GridSizeException if the size of the grid isn't 3x3 
-	 * @throws InvalidNumberOfPlayersException if the players aren't 2
-	 */
-	public PerfectVirtualPlayer(String name, TicTacToeGame game) throws MaximumPlayerNumberExceededException, GridSizeException, InvalidNumberOfPlayersException {
-		super(name);
-		setGame(game);
-	}
-
-	/**
-	 * It creates a player with default name and pawn.
-	 * It works only if the grid size is 3x3 and the players are 2.
-	 * 
-	 * @param nPLayer the number of the player (from 0)
-	 * @param game the <code>TicTacToeGame</code> instance 
-	 * @throws MaximumPlayerNumberExceededException if the players are too many for the pawn fixed values
-	 * @throws GridSizeException if the size of the grid isn't 3x3 
-	 * @throws InvalidNumberOfPlayersException if the players aren't 2
-	 */
-	public PerfectVirtualPlayer(int nPLayer, TicTacToeGame game) throws MaximumPlayerNumberExceededException, GridSizeException, InvalidNumberOfPlayersException {
-		super(nPLayer);
-		setGame(game);
-	}
-
-
-
-	@Override
-	public Point getNewPawnPoint() {
-		if (rotateValue == -1) {
-			createRotateValue();
-		}
-		updateCurrentRotatedGrid();
-		Point currentRotatedGridNewPoint = PERFECT_POINTS.get(gridToString(currentRotatedGrid));
-		assert currentRotatedGridNewPoint != null : "Situation not provided by PERFECT_POINTS.";
-		return getOriginalPointFromCurrentRotatedGridPoint(currentRotatedGridNewPoint);
 	}
 
 }

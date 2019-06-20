@@ -4,7 +4,7 @@ import model.components.Pawn;
 import model.exceptions.MaximumPlayerNumberExceededException;
 
 /**
- * It's an simple tic tac toe player.
+ * It's a simple tic tac toe player.
  */
 public class Player {
 
@@ -25,34 +25,16 @@ public class Player {
 	 * It's used from the controller to change the player turn.
 	 */
 	private int serialNumber;
-	public int getSerialNumber() {
-		return serialNumber;
-	}
-	private void setSerialNumber(int n) {
-		this.serialNumber = n;
-	}
 
 	/**
 	 * It's the player's name.
 	 */
 	private String name;
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
 
 	/**
 	 * It is always used the same in the content array of Grid.
 	 */
 	private Pawn pawn;
-	public Pawn getPawn() {
-		return pawn;
-	}
-	public void setPawn(Pawn pawn) {
-		this.pawn = pawn;
-	}
 
 
 
@@ -87,9 +69,34 @@ public class Player {
 
 
 
+	public int getSerialNumber() {
+		return serialNumber;
+	}
+
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public Pawn getPawn() {
+		return pawn;
+	}
+
 	@Override
 	public String toString() {
 		return getName() + " (" + getPawn() + ")";
+	}
+
+
+
+	private void setSerialNumber(int n) {
+		this.serialNumber = n;
+	}
+
+	private void setPawn(Pawn pawn) {
+		this.pawn = pawn;
 	}
 
 }

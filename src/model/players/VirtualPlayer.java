@@ -7,7 +7,7 @@ import model.exceptions.InvalidNumberOfPlayersException;
 import model.exceptions.MaximumPlayerNumberExceededException;
 
 /**
- * It's an an automatic player.
+ * An automatic player.
  */
 public abstract class VirtualPlayer extends Player {
 
@@ -15,30 +15,6 @@ public abstract class VirtualPlayer extends Player {
 	 * The reference of the <code>TicTacToeGame</code> instance.
 	 */
 	private TicTacToeGame game;
-	public TicTacToeGame getGame() {
-		return game;
-	}
-	/**
-	 * @param game the game
-	 * @throws GridSizeException if the size of the grid isn't 3x3 
-	 * @throws InvalidNumberOfPlayersException if the players aren't 2
-	 */
-	public void setGame(TicTacToeGame game) throws GridSizeException, InvalidNumberOfPlayersException {
-		if (game.getGrid().getContent().length != 3 || game.getGrid().getContent()[0].length != 3) {
-			throw new GridSizeException();
-		}
-		if (game.getPlayers().length != 2) {
-			throw new InvalidNumberOfPlayersException();
-		}
-		this.game = game;
-	}
-
-
-
-	/**
-	 * @return the new point selected by the <code>VirtualPlayer</code> automatically.
-	 */
-	public abstract Point getNewPawnPoint();
 
 
 
@@ -62,5 +38,28 @@ public abstract class VirtualPlayer extends Player {
 	}
 
 
+
+	public TicTacToeGame getGame() {
+		return game;
+	}
+	/**
+	 * @param game the game
+	 * @throws GridSizeException if the size of the grid isn't 3x3 
+	 * @throws InvalidNumberOfPlayersException if the players aren't 2
+	 */
+	public void setGame(TicTacToeGame game) throws GridSizeException, InvalidNumberOfPlayersException {
+		if (game.getGrid().getContent().length != 3 || game.getGrid().getContent()[0].length != 3) {
+			throw new GridSizeException();
+		}
+		if (game.getPlayers().length != 2) {
+			throw new InvalidNumberOfPlayersException();
+		}
+		this.game = game;
+	}
+
+	/**
+	 * @return the new point selected by the <code>VirtualPlayer</code> automatically.
+	 */
+	public abstract Point getNewPawnPoint();
 
 }

@@ -6,7 +6,7 @@ import model.exceptions.GridPositionOccupiedException;
 import model.exceptions.GridSizeException;
 
 /**
- * It's a tic tac toe grid with default or custom sizes.
+ * The tic tac toe grid with default or custom sizes.
  */
 public class Grid implements Cloneable {
 
@@ -27,19 +27,41 @@ public class Grid implements Cloneable {
 
 
 	/**
+	 * It creates a default grid.
+	 */
+	public Grid() {
+		setContent(new Pawn[DEFAULT_X_SIZE][DEFAULT_Y_SIZE]);
+	}
+
+	/**
+	 * It creates a custom grid.
+	 * 
+	 * @param xSize the size of x
+	 * @param ySize the size of y
+	 * @throws GridSizeException if the grid size isn't accepted.
+	 */
+	public Grid(final int xSize, final int ySize) throws GridSizeException {
+		if (areGridDimensionsCorrect(xSize, ySize)) {
+			setContent(new Pawn[xSize][ySize]);
+			return;
+		}
+		throw new GridSizeException();
+	}
+
+
+
+	/**
 	 * It uses coordinates (column[x]; row[y]).
 	 * 
 	 * column =	Pawn[n]
 	 */
 	private Pawn[][] content;
+
+
+
 	public Pawn[][] getContent() {
 		return content;
 	}
-	private void setContent(Pawn[][] content) {
-		this.content = content;
-	}
-
-
 
 	/**
 	 * It adds the pawn in a specific position of the grid.
@@ -63,16 +85,6 @@ public class Grid implements Cloneable {
 	public Pawn getPawn(Point point) throws GridPositionNotExistsException {
 		checkPositionExistenceInGrid(point);
 		return getContent()[point.getX()][point.getY()];
-	}
-
-	/**
-	 * @param point the point of the grid
-	 * @throws GridPositionNotExistsException if the point ins't inside the grid
-	 */
-	private void checkPositionExistenceInGrid(Point point) throws GridPositionNotExistsException {
-		if (point.getX() > content.length - 1 || point.getY() > content[0].length - 1) {
-			throw new GridPositionNotExistsException(point);
-		}
 	}
 
 	/**
@@ -104,6 +116,42 @@ public class Grid implements Cloneable {
 	}
 
 	/**
+	 * It returns a new independent grid.
+	 * 
+	 * @return a copied grid
+	 */
+	public Grid deepCopy() {
+		try {
+			Grid clonedGrid = (Grid) super.clone();
+			Pawn[][] clonedGridContent = getContent().clone();
+			for (byte i = 0; i < getContent().length; i++) {
+				clonedGridContent[i] = clonedGridContent[i].clone();
+			}
+			clonedGrid.setContent(clonedGridContent);
+			return clonedGrid;
+		} catch (CloneNotSupportedException exc) {
+			exc.printStackTrace();
+		}
+		return null;
+	}
+
+
+
+	private void setContent(Pawn[][] content) {
+		this.content = content;
+	}
+
+	/**
+	 * @param point the point of the grid
+	 * @throws GridPositionNotExistsException if the point ins't inside the grid
+	 */
+	private void checkPositionExistenceInGrid(Point point) throws GridPositionNotExistsException {
+		if (point.getX() > content.length - 1 || point.getY() > content[0].length - 1) {
+			throw new GridPositionNotExistsException(point);
+		}
+	}
+
+	/**
 	 * It check the correction of the grid size.
 	 * It is used from the constructor to verify the parameters.
 	 * 
@@ -125,49 +173,6 @@ public class Grid implements Cloneable {
 		if (getContent()[point.getX()][point.getY()] != null) {
 			throw new GridPositionOccupiedException(point);
 		}
-	}
-
-
-
-	/**
-	 * It creates a default grid.
-	 */
-	public Grid() {
-		setContent(new Pawn[DEFAULT_X_SIZE][DEFAULT_Y_SIZE]);
-	}
-
-	/**
-	 * It creates a custom grid.
-	 * 
-	 * @param xSize the size of x
-	 * @param ySize the size of y
-	 * @throws GridSizeException if the grid size isn't accepted.
-	 */
-	public Grid(final int xSize, final int ySize) throws GridSizeException {
-		if (areGridDimensionsCorrect(xSize, ySize)) {
-			setContent(new Pawn[xSize][ySize]);
-			return;
-		}
-		throw new GridSizeException();
-	}
-
-
-
-	@Override
-	public Grid clone() {
-		//Deep copy
-		try {
-			Grid clonedGrid = (Grid) super.clone();
-			Pawn[][] clonedGridContent = getContent().clone();
-			for (byte i = 0; i < getContent().length; i++) {
-				clonedGridContent[i] = clonedGridContent[i].clone();
-			}
-			clonedGrid.setContent(clonedGridContent);
-			return clonedGrid;
-		} catch (CloneNotSupportedException exc) {
-			exc.printStackTrace();
-		}
-		return null;
 	}
 
 }

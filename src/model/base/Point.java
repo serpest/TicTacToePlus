@@ -9,23 +9,11 @@ public class Point {
 	 * It's the x coordinate.
 	 */
 	private int x;
-	public int getX() {
-		return x;
-	}
-	private void setX(int x) {
-		this.x = x;
-	}
 
 	/**
 	 * It's the y coordinate.
 	 */
 	private int y;
-	public int getY() {
-		return y;
-	}
-	private void setY(int y) {
-		this.y = y;
-	}
 
 
 
@@ -40,9 +28,27 @@ public class Point {
 
 
 
+	public int getX() {
+		return x;
+	}
+
+	public int getY() {
+		return y;
+	}
+
 	@Override
 	public String toString() {
-		return "(" + getX() + "; " + getY() + ")";
+		return "(" + getX() + ", " + getY() + ")";
+	}
+
+
+
+	private void setX(int x) {
+		this.x = x;
+	}
+
+	private void setY(int y) {
+		this.y = y;
 	}
 
 }
