@@ -8,6 +8,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import model.base.Point;
+import model.checker.single.ColumnsChecker;
+import model.checker.single.HighDiagonalsChecker;
+import model.checker.single.LowDiagonalsChecker;
+import model.checker.single.RowsChecker;
 import model.components.Grid;
 import model.components.Pawn;
 
@@ -33,6 +37,11 @@ public class TicTacToeMainChecker {
 	private Pawn examinedPawn;
 
 	/**
+	 * The single checkers' <code>ExecutorService</code>.
+	 */
+	private ExecutorService executorService;
+
+	/**
 	 * The pawn was found or it was not found by anyone?
 	 */
 	private volatile boolean resultFound;
@@ -44,9 +53,18 @@ public class TicTacToeMainChecker {
 	 */
 	public TicTacToeMainChecker(final int TIC_TAC_TOE_NUMBER) {
 		this.TIC_TAC_TOE_NUMBER = TIC_TAC_TOE_NUMBER;
+		 initExecutorService();
 	}
 
 
+
+	public int getTIC_TAC_TOE_NUMBER() {
+		return TIC_TAC_TOE_NUMBER;
+	}
+
+	public Grid getGrid() {
+		return grid;
+	}
 
 	/**
 	 * It finds a tic tac toe.
@@ -60,13 +78,13 @@ public class TicTacToeMainChecker {
 		resetSearching();
 		this.grid = grid;
 		this.examinedPawn = examinedPawn; //If examinedPawn is null TicTacToeSingleChecker.checkLineTicTacToe doesn't find any false tic tac toe
-		List<Future<Point[]>> results = new ArrayList<>();
-		ExecutorService es = Executors.newFixedThreadPool(TicTacToeSingleChecker.Mode.values().length);
-		for (TicTacToeSingleChecker.Mode mode : TicTacToeSingleChecker.Mode.values()) {
-			results.add(es.submit(new TicTacToeSingleChecker(this, mode)));
-		}
+		List<Future<Point[]>> singleCheckersFutures = new ArrayList<>();
+		singleCheckersFutures.add(executorService.submit(new ColumnsChecker(this)));
+		singleCheckersFutures.add(executorService.submit(new RowsChecker(this)));
+		singleCheckersFutures.add(executorService.submit(new HighDiagonalsChecker(this)));
+		singleCheckersFutures.add(executorService.submit(new LowDiagonalsChecker(this)));
 		Point[] winnerPoints = null;
-		for (Future<Point[]> future : results) {
+		for (Future<Point[]> future : singleCheckersFutures) {
 			try {
 				winnerPoints = future.get();
 			} catch (InterruptedException | ExecutionException exc) {
@@ -76,19 +94,10 @@ public class TicTacToeMainChecker {
 				break;
 			}
 		}
-		es.shutdown();
 		return winnerPoints;
 	}
 
 
-
-	int getTIC_TAC_TOE_NUMBER() {
-		return TIC_TAC_TOE_NUMBER;
-	}
-
-	Grid getGrid() {
-		return grid;
-	}
 
 	Pawn getExaminedPawn() {
 		return examinedPawn;
@@ -109,6 +118,13 @@ public class TicTacToeMainChecker {
 	 */
 	private void resetSearching() {
 		resultFound = false;
+	}
+
+	/**
+	 * It initializes the the single checkers' executorService.
+	 */
+	private void initExecutorService() {
+		executorService = Executors.newFixedThreadPool(4);
 	}
 
 }

@@ -182,7 +182,7 @@ public class TicTacToeGame {
 			players[1] = new PerfectVirtualPlayer(1, this);
 			break;
 		case NORMAL:
-			players[1] = new NormalVirtualPlayer(1, this, Pawn.values()[1]);
+			players[1] = new NormalVirtualPlayer(1, this, Pawn.values()[0]);
 			break;
 		default:
 			assert false;

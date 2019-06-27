@@ -4,3 +4,4 @@ There are different modes: you can play in multiplayer in a classic or in a cust
 
 TicTacToePlus is fast and powerful in big grids using multithreading tic tac toe checkers (Maybe multitreading is useless in this case, but this code can be used in matrix analysis).
 I implemented the MVC pattern (Model-View-Controller) and there are two UI: GUI and CLI.
+The GUI graphics takes inspiration from https://commons.wikimedia.org/wiki/File:Tic_Tac_Toe.png.
