@@ -64,8 +64,7 @@ public class GUIController extends Controller {
 	 * @param event the event
 	 */
 	public synchronized void newGameActionPerformed(ActionEvent event) {
-		Button button = (Button) event.getSource();
-		TicTacToeGame newGame = getNewTicTacToeGame(button.getLabel());
+		TicTacToeGame newGame = getNewTicTacToeGame(event.getActionCommand());
 		setGame(newGame);
 		setupGame();
 		play();

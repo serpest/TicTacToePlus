@@ -1,11 +1,9 @@
 package view;
 
 import java.awt.BorderLayout;
-import java.awt.Button;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Panel;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
@@ -16,8 +14,10 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import controller.GUIController;
 import model.base.Point;
@@ -141,10 +141,10 @@ public class SimpleGUIView implements GUIView {
 			System.exit(-2);
 		}
 		//North panel creation
-		Button[] menuButtons = {new Button(NEW_NORMAL_SINGLEPLAYER_GAME), new Button(NEW_LEGEND_SINGLEPLAYER_GAME), new Button(NEW_CLASSIC_MULTIPLAYER_GAME)};
-		Panel menuPanel = new Panel();
+		JButton[] menuButtons = {new JButton(NEW_NORMAL_SINGLEPLAYER_GAME), new JButton(NEW_LEGEND_SINGLEPLAYER_GAME), new JButton(NEW_CLASSIC_MULTIPLAYER_GAME)};
+		JPanel menuPanel = new JPanel();
 		menuPanel.setBackground(Color.decode("#00ff00"));
-		for (Button button : menuButtons) {
+		for (JButton button : menuButtons) {
 			button.setBackground(Color.WHITE);
 			button.addActionListener(controller::newGameActionPerformed);
 			menuPanel.add(button);
