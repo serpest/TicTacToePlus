@@ -73,7 +73,6 @@ public class SimpleCLIView implements CLIView {
 				gameSelected = true;
 			}
 		}
-		sc.close();
 		return game;
 	}
 
@@ -128,7 +127,6 @@ public class SimpleCLIView implements CLIView {
 				sc.next();
 				continue;
 			}
-			sc.close();
 			return new Point(x, y);
 		}
 	}
@@ -174,7 +172,6 @@ public class SimpleCLIView implements CLIView {
 				gameSelected = true;
 			}
 		}
-		sc.close();
 		return game;
 	}
 
@@ -188,7 +185,6 @@ public class SimpleCLIView implements CLIView {
 		Grid grid = questionSingleCustomSetup("Do you want a custom grid?") ? getTicTacToeCustomGrid() : new Grid();
 		int ticTacToeNumber = questionSingleCustomSetup("Do you want a custom tic tac toe number?") ? getCustomTicTacToeNumber() : TicTacToeGame.DEFAULT_TIC_TAC_TOE_NUMBER;
 		try {
-			sc.close();
 			return new TicTacToeGame(players, grid, ticTacToeNumber);
 		} catch (InvalidNumberOfPlayersException | InvalidTicTacToeNumberException exc) {
 			assert false;
@@ -208,11 +204,9 @@ public class SimpleCLIView implements CLIView {
 			System.out.print(question + " [y/n]" + System.lineSeparator() + "> ");
 			String answer = sc.nextLine().toLowerCase();
 			if ("y".equals(answer)) {
-				sc.close();
 				return true;
 			}
 			else if ("n".equals(answer)) {
-				sc.close();
 				return false;
 			}
 			System.out.println("Enter \"y\" or \"n\"");
@@ -241,7 +235,6 @@ public class SimpleCLIView implements CLIView {
 				assert false : "The for statement isn't finish at the right moment.";
 			}
 		}
-		sc.close();
 		return players.toArray(new Player[players.size()]);
 	}
 
@@ -290,7 +283,6 @@ public class SimpleCLIView implements CLIView {
 				sc.next();
 				continue;
 			}
-			sc.close();
 			return ticTacToeNumber;
 		}
 	}

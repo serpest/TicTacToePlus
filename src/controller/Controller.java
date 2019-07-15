@@ -77,11 +77,15 @@ public abstract class Controller {
 
 	/**
 	 * It terminates the game with a draw result if the grid is full.
+	 * 
+	 * @return there is a draw
 	 */
-	void checkDraw() {
+	boolean checkDraw() {
 		if (getGame().getGrid().isFull()) {
 			setGameOver(true);
+			return true;
 		}
+		return false;
 	}
 
 	/**

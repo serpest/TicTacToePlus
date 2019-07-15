@@ -1,6 +1,5 @@
 package controller;
 
-import java.awt.Button;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 

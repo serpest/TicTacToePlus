@@ -77,12 +77,13 @@ public class CLIController extends Controller {
 	}
 
 	@Override
-	void checkDraw() {
-		super.checkDraw();
-		if (isGameOver()) {
+	boolean checkDraw() {
+		if (super.checkDraw()) {
 			view.showGrid(getGame().getGrid());
 			view.showDraw();
+			return true;
 		}
+		return false;
 	}
 
 }
