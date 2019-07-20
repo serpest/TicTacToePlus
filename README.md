@@ -12,18 +12,22 @@ In TicTacToePlus you can play in multiplayer in a classic or in a custom game se
 
 In specific there are the follow modes:
 
-Multiplayer: Classic Game - 3x3 grid, 2 players, tic tac toe number: 3
+* Multiplayer: Classic Game - 3x3 grid, 2 players, tic tac toe number: 3
 
-Multiplayer: Custom Game - custom grid, custom players, custom tic tac toe number
+* Multiplayer: Custom Game - custom grid, custom players, custom tic tac toe number
 
-Single-player: Normal - 3x3 grid, normal opponent, tic tac toe number: 3
+* Single-player: Normal - 3x3 grid, normal opponent, tic tac toe number: 3
 
-Single-player: Legend - 3x3 grid, invincible opponent, tic tac toe number: 3
+* Single-player: Legend - 3x3 grid, invincible opponent, tic tac toe number: 3
 
 
 
 ## UI
-In TicTacToePlus there are two UI: Simple CLI, where all modes are available, and Simple GUI, where the custom setup modes aren't available.
+In TicTacToePlus there are two UI:
+
+* Simple CLI, where all modes are available
+
+* Simple GUI, where the custom setup modes aren't available.
 
 
 
