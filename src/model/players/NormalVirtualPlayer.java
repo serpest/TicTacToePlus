@@ -19,6 +19,11 @@ import model.exceptions.MaximumPlayerNumberExceededException;
 public class NormalVirtualPlayer extends VirtualPlayer {
 
 	/**
+	 * The last empty points recognized.
+	 */
+	private List<Point> lastEmptyPointsInGrid;
+
+	/**
 	 * The tic tac toe checker.
 	 */
 	private TicTacToeMainChecker checker;
@@ -126,22 +131,20 @@ public class NormalVirtualPlayer extends VirtualPlayer {
 	 * @return the <code>List</code> of the empty points in the grid
 	 */
 	private List<Point> getEmptyPointsInGrid() {
-		List<Point> emptyPoints = new ArrayList<>();
-		Point currentPoint;
-		for (int iColumn = 0; iColumn < getGame().getGrid().getContent().length; iColumn++) {
-			for (int iRow = 0; iRow < getGame().getGrid().getContent()[0].length; iRow++) {
-				currentPoint = new Point(iColumn, iRow);
-				if (getGame().getGrid().getPawn(currentPoint) == null) {
-					emptyPoints.add(currentPoint);
-				}
+		for (int i = 0; i < lastEmptyPointsInGrid.size(); i++) {
+			if (getGame().getGrid().getPawn(lastEmptyPointsInGrid.get(i)) != null) {
+				lastEmptyPointsInGrid.remove(i);
+				i--;
 			}
 		}
-		return emptyPoints;
+		return lastEmptyPointsInGrid;
 	}
 
 	/**
 	 * It initializes the VirtualPlayer's variables.
 	 * 
+	 * @param game the game
+	 * @param opponentPawn the opponent's pawn
 	 * @throws GridSizeException if the size of the grid isn't 3x3 
 	 * @throws InvalidNumberOfPlayersException if the players aren't 2
 	 */
@@ -149,6 +152,21 @@ public class NormalVirtualPlayer extends VirtualPlayer {
 		this.setGame(game);
 		this.opponentPawn = opponentPawn;
 		this.checker = new TicTacToeMainChecker(game.getTicTacToeNumber());
+		initLastEmptyPointsInGrid();
+	}
+
+	/**
+	 * It initializes the <code>lastEmptyPointsInGrid</code> using all the point in the list.
+	 */
+	private void initLastEmptyPointsInGrid() {
+		int xSize = getGame().getGrid().getContent().length;
+		int ySize = getGame().getGrid().getContent()[0].length;
+		lastEmptyPointsInGrid = new ArrayList<Point>(xSize * ySize);
+		for (int x = 0; x < xSize; x++) {
+			for (int y = 0; y < ySize; y++) {
+				lastEmptyPointsInGrid.add(new Point(x, y));
+			}
+		}
 	}
 
 }

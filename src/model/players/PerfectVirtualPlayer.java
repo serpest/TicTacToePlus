@@ -371,7 +371,7 @@ public class PerfectVirtualPlayer extends VirtualPlayer {
 
 
 	/**
-	 * It updates the <code>currentRotatedGrid</code> using the game grid and the <code>rotateValue<code>.
+	 * It updates the <code>currentRotatedGrid</code> using the game grid and the <code>rotateValue</code>.
 	 */
 	private void updateCurrentRotatedGrid() {
 		if (rotateValue == 0) { //Fast method
