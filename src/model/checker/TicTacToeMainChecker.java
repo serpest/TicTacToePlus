@@ -1,6 +1,7 @@
 package model.checker;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -41,11 +42,6 @@ public class TicTacToeMainChecker {
 	 */
 	private ExecutorService executorService;
 
-	/**
-	 * The pawn was found or it was not found by anyone?
-	 */
-	private volatile boolean resultFound;
-
 
 
 	/**
@@ -75,24 +71,25 @@ public class TicTacToeMainChecker {
 	 * @return the winner points or null if there isn't a tic tac toe
 	 */
 	public Point[] checkTicTacToe(Grid grid, Pawn examinedPawn) {
-		resetSearching();
 		this.grid = grid;
 		this.examinedPawn = examinedPawn; //If examinedPawn is null TicTacToeSingleChecker.checkLineTicTacToe doesn't find any false tic tac toe
-		List<Future<Point[]>> singleCheckersFutures = new ArrayList<>();
-		singleCheckersFutures.add(executorService.submit(new ColumnsChecker(this)));
-		singleCheckersFutures.add(executorService.submit(new RowsChecker(this)));
-		singleCheckersFutures.add(executorService.submit(new HighDiagonalsChecker(this)));
-		singleCheckersFutures.add(executorService.submit(new LowDiagonalsChecker(this)));
+		Collection<TicTacToeSingleChecker> tasks = new ArrayList<>(4);
+		tasks.add(new ColumnsChecker(grid, TIC_TAC_TOE_NUMBER, examinedPawn));
+		tasks.add(new RowsChecker(grid, TIC_TAC_TOE_NUMBER, examinedPawn));
+		tasks.add(new HighDiagonalsChecker(grid, TIC_TAC_TOE_NUMBER, examinedPawn));
+		tasks.add(new LowDiagonalsChecker(grid, TIC_TAC_TOE_NUMBER, examinedPawn));
 		Point[] winnerPoints = null;
-		for (Future<Point[]> future : singleCheckersFutures) {
-			try {
+		try {
+			List<Future<Point[]>> winnerPointsFutures = executorService.invokeAll(tasks);
+			for (Future<Point[]> future : winnerPointsFutures) {
 				winnerPoints = future.get();
-			} catch (InterruptedException | ExecutionException exc) {
-				exc.printStackTrace();
+				if (winnerPoints != null) {
+					break;
+				}
 			}
-			if (winnerPoints != null) {
-				break;
-			}
+		} catch (InterruptedException | ExecutionException exc) {
+			exc.printStackTrace();
+			System.exit(1);
 		}
 		return winnerPoints;
 	}
@@ -103,22 +100,7 @@ public class TicTacToeMainChecker {
 		return examinedPawn;
 	}
 
-	boolean isResultFound() {
-		return resultFound;
-	}
 
-	void setResultFound(boolean resultFound) {
-		this.resultFound = resultFound;
-	}
-
-
-
-	/**
-	 * It resets <code>resultFound</code>.
-	 */
-	private void resetSearching() {
-		resultFound = false;
-	}
 
 	/**
 	 * It initializes the the single checkers' executorService.

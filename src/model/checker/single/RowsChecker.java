@@ -1,9 +1,9 @@
 package model.checker.single;
 
 import model.base.Point;
-import model.checker.TicTacToeMainChecker;
 import model.checker.TicTacToeSingleChecker;
 import model.components.Grid;
+import model.components.Pawn;
 
 /**
  * It checks tic tac toe in rows.
@@ -11,13 +11,13 @@ import model.components.Grid;
 public class RowsChecker extends TicTacToeSingleChecker {
 
 	/**
-	 * It creates the single checker.
-	 * 
-	 * @param MAIN_CHECKER the main checker
+	 * @param GRID the examined grid
+	 * @param TIC_TAC_TOE_NUMBER the tic tac toe number of the game
+	 * @param EXAMINED_PAWN the examined pawn
 	 */
-	public RowsChecker(final TicTacToeMainChecker MAIN_CHECKER) {
-		super(MAIN_CHECKER);
-		setChecksNumber(getNewChecksNumber(MAIN_CHECKER.getGrid()));
+	public RowsChecker(final Grid GRID, final int TIC_TAC_TOE_NUMBER, final Pawn EXAMINED_PAWN) {
+		super(GRID, TIC_TAC_TOE_NUMBER, EXAMINED_PAWN);
+		setChecksNumber(getNewChecksNumber(getGRID()));
 		setCheckMethod(this::checkRowTicTacToe);
 	}
 
@@ -38,7 +38,7 @@ public class RowsChecker extends TicTacToeSingleChecker {
 	 * @return the winner points or null
 	 */
 	private Point[] checkRowTicTacToe(final int iRow) {
-		return checkLineTicTacToe(getMAIN_CHECKER().getGrid().getContent().length, (i)->new Point(i,iRow));
+		return checkLineTicTacToe(getGRID().getContent().length, (i)->new Point(i,iRow));
 	}
 
 }

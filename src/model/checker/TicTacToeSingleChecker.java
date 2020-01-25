@@ -1,5 +1,6 @@
 package model.checker;
 
+import model.components.Grid;
 import model.components.Pawn;
 
 import java.util.concurrent.Callable;
@@ -12,10 +13,19 @@ import model.base.Point;
 public abstract class TicTacToeSingleChecker implements Callable<Point[]> {
 
 	/**
-	 * The main checker that creates this single checker.
-	 * It's used to get the grid, the <code>resultFound</code> boolean and the <code>examinedPawn</code>.
+	 * The examined grid.
 	 */
-	private final TicTacToeMainChecker MAIN_CHECKER;
+	private final Grid GRID;
+
+	/**
+	 * The tic tac toe number of the game.
+	 */
+	private final int TIC_TAC_TOE_NUMBER;
+
+	/**
+	 * The examined pawn.
+	 */
+	private final Pawn EXAMINED_PAWN;
 
 	/**
 	 * the method using by <code>checkLinesTicTacToe()</code> to do the check.
@@ -31,19 +41,17 @@ public abstract class TicTacToeSingleChecker implements Callable<Point[]> {
 
 
 	/**
-	 * It creates a single checker.
-	 * 
-	 * @param MAIN_CHECKER the main checker
+	 * @param GRID the examined grid
+	 * @param TIC_TAC_TOE_NUMBER the tic tac toe number of the game
+	 * @param EXAMINED_PAWN the examined pawn
 	 */
-	public TicTacToeSingleChecker(final TicTacToeMainChecker MAIN_CHECKER) {
-		this.MAIN_CHECKER = MAIN_CHECKER;
+	public TicTacToeSingleChecker(final Grid GRID, final int TIC_TAC_TOE_NUMBER, final Pawn EXAMINED_PAWN) {
+		this.GRID = GRID;
+		this.TIC_TAC_TOE_NUMBER = TIC_TAC_TOE_NUMBER;
+		this.EXAMINED_PAWN = EXAMINED_PAWN;
 	}
 
 
-
-	public TicTacToeMainChecker getMAIN_CHECKER() {
-		return MAIN_CHECKER;
-	}
 
 	/**
 	 * It checks the lines selected and it returns the result.
@@ -52,12 +60,8 @@ public abstract class TicTacToeSingleChecker implements Callable<Point[]> {
 	public Point[] call() {
 		Point[] winnerPoints = null;
 		for (int i = 0; i < checksNumber; i++) {
-			if (MAIN_CHECKER.isResultFound()) {
-				return null;
-			}
 			winnerPoints = checkMethod.get(i);
 			if (winnerPoints != null) {
-				MAIN_CHECKER.setResultFound(true);
 				break;
 			}
 		}
@@ -65,6 +69,10 @@ public abstract class TicTacToeSingleChecker implements Callable<Point[]> {
 	}
 
 
+
+	protected Grid getGRID() {
+		return GRID;
+	}
 
 	protected void setCheckMethod(Check checkMethod) {
 		this.checkMethod = checkMethod;
@@ -87,20 +95,20 @@ public abstract class TicTacToeSingleChecker implements Callable<Point[]> {
 		Point[] winnerPoints;
 		Pawn currentMainPawn;
 		Pawn currentExaminedPawn;
-		for (int i = 0; i <= lineSize - MAIN_CHECKER.getTIC_TAC_TOE_NUMBER(); i++) {
-			winnerPoints = new Point[MAIN_CHECKER.getTIC_TAC_TOE_NUMBER()];
+		for (int i = 0; i <= lineSize - TIC_TAC_TOE_NUMBER; i++) {
+			winnerPoints = new Point[TIC_TAC_TOE_NUMBER];
 			winnerPoints[0] = selector.get(i);
-			currentMainPawn = MAIN_CHECKER.getGrid().getPawn(winnerPoints[0]);
-			if (currentMainPawn == null || !currentMainPawn.equals(MAIN_CHECKER.getExaminedPawn())) {
+			currentMainPawn = GRID.getPawn(winnerPoints[0]);
+			if (currentMainPawn == null || !currentMainPawn.equals(EXAMINED_PAWN)) {
 				continue;
 			}
-			for (int j = 1; j < MAIN_CHECKER.getTIC_TAC_TOE_NUMBER(); j++) {
+			for (int j = 1; j < TIC_TAC_TOE_NUMBER; j++) {
 				winnerPoints[j] = selector.get(i + j);
-				currentExaminedPawn = MAIN_CHECKER.getGrid().getPawn(winnerPoints[j]);
+				currentExaminedPawn = GRID.getPawn(winnerPoints[j]);
 				if (currentExaminedPawn == null || !currentMainPawn.equals(currentExaminedPawn)) {
 					break;
 				}
-				if (j == MAIN_CHECKER.getTIC_TAC_TOE_NUMBER() - 1) {
+				if (j == TIC_TAC_TOE_NUMBER - 1) {
 					return winnerPoints;
 				}
 			}	 

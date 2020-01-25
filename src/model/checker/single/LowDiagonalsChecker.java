@@ -1,7 +1,8 @@
 package model.checker.single;
 
 import model.base.Point;
-import model.checker.TicTacToeMainChecker;
+import model.components.Grid;
+import model.components.Pawn;
 
 /**
  * It checks tic tac toe in low diagonals.
@@ -9,21 +10,21 @@ import model.checker.TicTacToeMainChecker;
 public class LowDiagonalsChecker extends DiagonalsChecker {
 
 	/**
-	 * It creates the single checker.
-	 * 
-	 * @param MAIN_CHECKER the main checker
+	 * @param GRID the examined grid
+	 * @param TIC_TAC_TOE_NUMBER the tic tac toe number of the game
+	 * @param EXAMINED_PAWN the examined pawn
 	 */
-	public LowDiagonalsChecker(final TicTacToeMainChecker MAIN_CHECKER) {
-		super(MAIN_CHECKER);
-		setChecksNumber(getNewChecksNumber(MAIN_CHECKER));
+	public LowDiagonalsChecker(final Grid GRID, final int TIC_TAC_TOE_NUMBER, final Pawn EXAMINED_PAWN) {
+		super(GRID, TIC_TAC_TOE_NUMBER, EXAMINED_PAWN);
+		setChecksNumber(getNewChecksNumber(TIC_TAC_TOE_NUMBER));
 		setCheckMethod((iRow)->checkDiagonalTicTacToe(new Point( 0, iRow)));
 	}
 
 
 
 	@Override
-	protected int getNewChecksNumber(TicTacToeMainChecker MAIN_CHECKER) {
-		return MAIN_CHECKER.getGrid().getContent()[0].length - MAIN_CHECKER.getTIC_TAC_TOE_NUMBER() + 1;
+	protected int getNewChecksNumber(int TIC_TAC_TOE_NUMBER) {
+		return getGRID().getContent()[0].length - TIC_TAC_TOE_NUMBER + 1;
 	}
 
 }
