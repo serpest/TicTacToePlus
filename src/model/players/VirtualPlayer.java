@@ -1,65 +1,42 @@
 package model.players;
 
-import model.TicTacToeGame;
 import model.base.Point;
+import model.components.Grid;
 import model.exceptions.GridSizeException;
-import model.exceptions.InvalidNumberOfPlayersException;
-import model.exceptions.MaximumPlayerNumberExceededException;
+import model.exceptions.MaximumPlayersNumberExceededException;
 
-/**
- * An automatic player.
- */
 public abstract class VirtualPlayer extends Player {
 
-	/**
-	 * The reference of the <code>TicTacToeGame</code> instance.
-	 */
-	private TicTacToeGame game;
+	private Grid currentOriginalGrid;
 
 
 
-	/**
-	 * It creates a player with a custom name, but a fixed pawn.
-	 * 
-	 * @param name the player's name
-	 * @throws MaximumPlayerNumberExceededException if the players are too many for the pawn fixed values
-	 */
-	public VirtualPlayer(String name) throws MaximumPlayerNumberExceededException {
+	public VirtualPlayer(String name) throws MaximumPlayersNumberExceededException {
 		super(name);
 	}
 
-	/**
-	 * It creates a player with default name and pawn.
-	 * 
-	 * @param nPLayer the number of the player (from 0)
-	 */
-	public VirtualPlayer(int nPLayer) {
-		super(nPLayer);
+	public VirtualPlayer() throws MaximumPlayersNumberExceededException {
+		super();
 	}
 
 
 
-	public TicTacToeGame getGame() {
-		return game;
+	public Grid getCurrentOriginalGrid() {
+		return currentOriginalGrid;
 	}
-	/**
-	 * @param game the game
-	 * @throws GridSizeException if the size of the grid isn't 3x3 
-	 * @throws InvalidNumberOfPlayersException if the players aren't 2
-	 */
-	public void setGame(TicTacToeGame game) throws GridSizeException, InvalidNumberOfPlayersException {
-		if (game.getGrid().getContent().length != 3 || game.getGrid().getContent()[0].length != 3) {
+
+	public void setCurrentOriginalGrid(Grid currentOriginalGrid) {
+		if (!isGridValid(currentOriginalGrid))
 			throw new GridSizeException();
-		}
-		if (game.getPlayers().length != 2) {
-			throw new InvalidNumberOfPlayersException();
-		}
-		this.game = game;
+		this.currentOriginalGrid = currentOriginalGrid;
 	}
 
-	/**
-	 * @return the new point selected by the <code>VirtualPlayer</code> automatically.
-	 */
-	public abstract Point getNewPawnPoint();
+	public abstract Point getNewPawnPoint(Grid grid);
+
+
+
+	protected boolean isGridValid(Grid grid) {
+		return grid.getXSize() == 3 && grid.getYSize() == 3;
+	}
 
 }

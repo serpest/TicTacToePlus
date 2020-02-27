@@ -4,9 +4,6 @@ import controller.Controller;
 import controller.CLIController;
 import controller.GUIController;
 
-/**
- * The game launcher.
- */
 public class Main {
 
 	/**
@@ -25,13 +22,6 @@ public class Main {
 		controller.start();
 	}
 
-
-
-	/**
-	 * @param UIString the UI to use
-	 * @return the controller
-	 * @throws IllegalArgumentException if the string ins't right
-	 */
 	private static Controller getController(String UIString) throws IllegalArgumentException {
 		switch (UIString.toUpperCase()) {
 		case "GUI":
@@ -43,11 +33,8 @@ public class Main {
 		}
 	}
 
-	/**
-	 * It prints the help message.
-	 */
 	private static void printHelpMessage() {
-		System.out.println("Enter an argument:" + System.lineSeparator() + "\tGUI - Graphical User Interface"+ System.lineSeparator() + "\tCLI - Command Line Interface");
+		System.out.println("TicTacToePlus requires one of these arguments:" + System.lineSeparator() + "\tGUI - Graphical User Interface"+ System.lineSeparator() + "\tCLI - Command Line Interface");
 	}
 
 }

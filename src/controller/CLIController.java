@@ -7,57 +7,42 @@ import model.players.VirtualPlayer;
 import view.CLIView;
 import view.SimpleCLIView;
 
-/**
- * The CLI controller used to manage the game.
- */
 public class CLIController extends Controller {
 
-	/**
-	 * The game UI.
-	 */
 	private CLIView view;
 
- 
-
-	/**
-	 * It gets the view.
-	 */
 	public CLIController() {
 		this.view = SimpleCLIView.getInstance();
 	}
 
-
-
 	@Override
 	public void start() {
-		setGame(view.getTicTacToeGame());
+		setGame(view.getNewTicTacToeGame());
 		setupGame();
 		play();
 	}
 
-
-
 	@Override
-	void play() {
-		while (!isGameOver()) {
-			placePlayerTile();
+	protected void play() {
+		while (!getGame().isGameOver()) {
+			placePlayerPawn();
 			finishTurn();
 		}
 		start(); //It starts a new game
 	}
 
 	@Override
-	void placePlayerTile() {
+	protected void placePlayerPawn() {
 		view.showGrid(getGame().getGrid());
 		view.showPlayerTurn(getCurrentPlayer());
 		if (getCurrentPlayer() instanceof VirtualPlayer) {
-			getGame().getGrid().addPawn(getCurrentPlayer().getPawn(), ((VirtualPlayer) getCurrentPlayer()).getNewPawnPoint());
+			placeVirtualPlayerPawn((VirtualPlayer) getCurrentPlayer());
 		}
 		else {
 			boolean turnFinished = false;
 			while (!turnFinished) {
 				try {
-					getGame().getGrid().addPawn(getCurrentPlayer().getPawn(), view.getPointNewPawn());
+					getGame().addPawnToGrid(getCurrentPlayer().getPawn(), view.getPointNewPawn());
 					turnFinished = true;
 				} catch (GridPositionOccupiedException | GridPositionNotExistsException exc) {
 					System.out.println(exc.getMessage());
@@ -67,17 +52,18 @@ public class CLIController extends Controller {
 	}
 
 	@Override
-	void checkTicTacToe() {
+	protected boolean checkTicTacToe() {
 		Player winnerPlayer = getGame().getWinnerPlayer(getCurrentPlayer().getPawn());
 		if (winnerPlayer != null) {
-			setGameOver(true);
 			view.showGrid(getGame().getGrid());
 			view.showWinner(winnerPlayer);
+			return true;
 		}
+		return false;
 	}
 
 	@Override
-	boolean checkDraw() {
+	protected boolean checkDraw() {
 		if (super.checkDraw()) {
 			view.showGrid(getGame().getGrid());
 			view.showDraw();

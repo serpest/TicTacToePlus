@@ -3,21 +3,23 @@ package model.players;
 import java.util.HashMap;
 import java.util.Map;
 
-import model.TicTacToeGame;
 import model.base.Point;
 import model.components.Grid;
 import model.components.Pawn;
 import model.exceptions.GridSizeException;
 import model.exceptions.InvalidNumberOfPlayersException;
-import model.exceptions.MaximumPlayerNumberExceededException;
+import model.exceptions.MaximumPlayersNumberExceededException;
 
 /**
- * An automatic and perfect player in 3x3 grid.
+ * An automatic and perfect player in 3x3 grid. The players must be 2.
  * It uses the following trees:
  * 	First player - https://en.wikipedia.org/wiki/File:Tictactoe-X.svg;
  * 	Second player - https://en.wikipedia.org/wiki/File:Tictactoe-O.svg.
  */
 public class PerfectVirtualPlayer extends VirtualPlayer {
+
+	private static final Point[] BOTTOM_POINTS = {new Point(0, 0), new Point(0, 2), new Point(2, 2), new Point(2, 0)};
+	private static final Point[] LATERAL_POINTS = {new Point(0, 1), new Point(1, 2), new Point(2, 1), new Point(1, 0)};
 
 	/**
 	 * The new point for all the configurations.
@@ -315,7 +317,7 @@ public class PerfectVirtualPlayer extends VirtualPlayer {
 	 * The initial value is -1 because 0 is a valid value.
 	 * Values: 0 - 3
 	 */
-	private int rotateValue = -1;
+	private int rotateValue;
 
 	/**
 	 * The rotated grid (it's a equivalence class).
@@ -325,40 +327,21 @@ public class PerfectVirtualPlayer extends VirtualPlayer {
 
 
 
-	/**
-	 * It creates a player with a custom name, but a fixed pawn.
-	 * It works only if the grid size is 3x3 and the players are 2.
-	 * 
-	 * @param name the player's name
-	 * @param game the <code>TicTacToeGame</code> instance 
-	 * @throws MaximumPlayerNumberExceededException if the players are too many for the pawn fixed values
-	 * @throws GridSizeException if the size of the grid isn't 3x3 
-	 * @throws InvalidNumberOfPlayersException if the players aren't 2
-	 */
-	public PerfectVirtualPlayer(String name, TicTacToeGame game) throws MaximumPlayerNumberExceededException, GridSizeException, InvalidNumberOfPlayersException {
+	public PerfectVirtualPlayer(String name) throws MaximumPlayersNumberExceededException, GridSizeException, InvalidNumberOfPlayersException {
 		super(name);
-		setGame(game);
+		init();
 	}
 
-	/**
-	 * It creates a player with default name and pawn.
-	 * It works only if the grid size is 3x3 and the players are 2.
-	 * 
-	 * @param nPLayer the number of the player (from 0)
-	 * @param game the <code>TicTacToeGame</code> instance 
-	 * @throws MaximumPlayerNumberExceededException if the players are too many for the pawn fixed values
-	 * @throws GridSizeException if the size of the grid isn't 3x3 
-	 * @throws InvalidNumberOfPlayersException if the players aren't 2
-	 */
-	public PerfectVirtualPlayer(int nPLayer, TicTacToeGame game) throws MaximumPlayerNumberExceededException, GridSizeException, InvalidNumberOfPlayersException {
-		super(nPLayer);
-		setGame(game);
+	public PerfectVirtualPlayer() throws MaximumPlayersNumberExceededException, GridSizeException, InvalidNumberOfPlayersException {
+		super();
+		init();
 	}
 
 
 
 	@Override
-	public Point getNewPawnPoint() {
+	public Point getNewPawnPoint(Grid grid) {
+		setCurrentOriginalGrid(grid);
 		if (rotateValue == -1) {
 			createRotateValue();
 		}
@@ -368,17 +351,20 @@ public class PerfectVirtualPlayer extends VirtualPlayer {
 		return getOriginalPointFromCurrentRotatedGridPoint(currentRotatedGridNewPoint);
 	}
 
+	public void init() {
+		rotateValue = -1;
+	}
+
 
 
 	/**
 	 * It updates the <code>currentRotatedGrid</code> using the game grid and the <code>rotateValue</code>.
 	 */
 	private void updateCurrentRotatedGrid() {
-		if (rotateValue == 0) { //Fast method
-			currentRotatedGrid = getGame().getGrid();
-			return;
-		}
-		currentRotatedGrid = getRotatetedGrid(getGame().getGrid(), 4 - rotateValue);
+		if (rotateValue == 0) //Fast method
+			currentRotatedGrid = getCurrentOriginalGrid();
+		else
+			currentRotatedGrid = getRotatetedGrid(getCurrentOriginalGrid(), 4 - rotateValue);
 	}
 
 	/**
@@ -413,7 +399,7 @@ public class PerfectVirtualPlayer extends VirtualPlayer {
 	 * @return the new point rotated to right
 	 */
 	private Point getRotatedPointToRight(Point point) {
-		return new Point(point.getY(), 2 -point.getX());
+		return new Point(point.getY(), 2 - point.getX());
 	}
 
 	/**
@@ -435,18 +421,13 @@ public class PerfectVirtualPlayer extends VirtualPlayer {
 		return rotatedGrid;
 	}
 
-	/**
-	 * It creates the <code>rotateValue</code>.
-	 */
 	private void createRotateValue() {
-		if (getGame().getGrid().isEmpty() || getGame().getGrid().getContent()[1][1] != null) {
+		if (getCurrentOriginalGrid().isEmpty() || getCurrentOriginalGrid().getPawn(new Point(1, 1)) != null) {
 			rotateValue = (int) (Math.random()*4);
 		}
 		else {
-			final Point[] BOTTOM_POINTS = {new Point(0, 0), new Point(0, 2), new Point(2, 2), new Point(2, 0)};
-			final Point[] LATERAL_POINTS = {new Point(0, 1), new Point(1, 2), new Point(2, 1), new Point(1, 0)};
-			createRotateValueFromOccupiedGrid(BOTTOM_POINTS);
-			createRotateValueFromOccupiedGrid(LATERAL_POINTS);
+			getRotateValueFromOccupiedGrid(BOTTOM_POINTS);
+			getRotateValueFromOccupiedGrid(LATERAL_POINTS);
 		}
 		
 	}
@@ -457,9 +438,9 @@ public class PerfectVirtualPlayer extends VirtualPlayer {
 	 * 
 	 * @param POINTS the examined points
 	 */
-	private void createRotateValueFromOccupiedGrid(final Point[] POINTS) {
+	private void getRotateValueFromOccupiedGrid(final Point[] POINTS) {
 		for (byte i = 0; i < POINTS.length; i++) {
-			if (getGame().getGrid().getPawn(POINTS[i]) != null) {
+			if (getCurrentOriginalGrid().getPawn(POINTS[i]) != null) {
 				rotateValue = i;
 				break;
 			}
@@ -475,8 +456,8 @@ public class PerfectVirtualPlayer extends VirtualPlayer {
 	private String gridToString(Grid grid) {
 		StringBuilder sb = new StringBuilder();
 		Pawn currentPawn;
-		for (byte iRow = 0; iRow < grid.getContent()[0].length; iRow++) {
-			for (byte iColumn = 0; iColumn < grid.getContent().length; iColumn++) {
+		for (byte iRow = 0; iRow < grid.getYSize(); iRow++) {
+			for (byte iColumn = 0; iColumn < grid.getXSize(); iColumn++) {
 				currentPawn = grid.getContent()[iColumn][iRow];
 				sb.append((currentPawn != null) ? ((currentPawn.equals(this.getPawn()) ? "X" : "O")) : "_");
 			}

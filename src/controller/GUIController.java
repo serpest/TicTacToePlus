@@ -5,19 +5,17 @@ import java.awt.event.MouseEvent;
 
 import model.TicTacToeGame;
 import model.base.Point;
+import model.components.Pawn;
 import model.exceptions.GridPositionOccupiedException;
+import model.players.NormalVirtualPlayer;
+import model.players.PerfectVirtualPlayer;
+import model.players.Player;
 import model.players.VirtualPlayer;
 import view.GUIView;
 import view.SimpleGUIView;
 
-/**
- * The GUI controller used to manage the game.
- */
 public class GUIController extends Controller {
 
-	/**
-	 * The game UI.
-	 */
 	private GUIView view;
 
 	/**
@@ -27,9 +25,6 @@ public class GUIController extends Controller {
 
 
 
-	/**
-	 * It gets the view.
-	 */
 	public GUIController() {
 		view = new SimpleGUIView(this);
 	}
@@ -42,10 +37,10 @@ public class GUIController extends Controller {
 	 * @param event the mouse event
 	 */
 	public synchronized void newPawnMouseClicked(MouseEvent event) {
-		if (newPawnSelectionActive && !isGameOver()) {
-			Point newPawnPoint = new Point((int) (event.getX() / (view.getGridImageDimension().getWidth() / getGame().getGrid().getContent().length)), (int) ((event.getY() / (view.getGridImageDimension().getHeight() / getGame().getGrid().getContent()[0].length))));
+		if (newPawnSelectionActive && !getGame().isGameOver()) {
+			Point newPawnPoint = new Point((int) (event.getX() / (view.getGridImageDimension().getWidth() / getGame().getGrid().getXSize())), (int) ((event.getY() / (view.getGridImageDimension().getHeight() / getGame().getGrid().getYSize()))));
 			try {
-				getGame().getGrid().addPawn(getCurrentPlayer().getPawn(), newPawnPoint);
+				getGame().addPawnToGrid(getCurrentPlayer().getPawn(), newPawnPoint);
 			} catch (GridPositionOccupiedException exc) {
 				return;
 			}
@@ -71,53 +66,52 @@ public class GUIController extends Controller {
 
 	@Override
 	public void start() {
-		view.setupFrame();
+		//It starts the UI used to select the game mode and not the game
+		view.setupGameFrame();
 	}
 
 
 
 	@Override
-	void setupGame() {
+	protected void setupGame() {
 		super.setupGame();
 		view.resetGrid();
 		newPawnSelectionActive = false;
 	}
 
 	@Override
-	synchronized void placePlayerTile() {
-		//It is used ONLY when there is a VirtualPlayer's turn
+	protected synchronized void placePlayerPawn() {
+		//It is used ONLY when it's a VirtualPlayer's turn
 		if (getCurrentPlayer() instanceof VirtualPlayer) {
-			getGame().getGrid().addPawn(getCurrentPlayer().getPawn(), ((VirtualPlayer) getCurrentPlayer()).getNewPawnPoint());
+			placeVirtualPlayerPawn((VirtualPlayer) getCurrentPlayer());
 			view.showGrid(getGame().getGrid());
 		}
 	}
 
 	@Override
-	void checkTicTacToe() {
+	protected boolean checkTicTacToe() {
 		Point[] winnerPoints = getGame().getWinnerPoints(getCurrentPlayer().getPawn());
 		if (winnerPoints != null) {
-			setGameOver(true);
 			view.showWinnerPoints(winnerPoints);
+			return true;
 		}
+		return false;
 	}
 
 	@Override
-	void play() {
-		//It does a VirtualPlayer turn
-		if (isGameOver()) {
+	protected void play() {
+		if (getGame().isGameOver())
 			return;
-		}
+		//It does a VirtualPlayer turn
 		if (getCurrentPlayer() instanceof VirtualPlayer) {
-			placePlayerTile();
+			placePlayerPawn();
 			finishTurn();
 		}
-		//It use the play() method again if the next player is a VirtualPLayer, otherwise it allows a GUI interaction.
-		if (getCurrentPlayer() instanceof VirtualPlayer) {
+		//It uses the play() method again if the next player is a VirtualPLayer, otherwise it allows a GUI interaction
+		if (getCurrentPlayer() instanceof VirtualPlayer)
 			play();
-		}
-		else {
+		else
 			newPawnSelectionActive = true;
-		}
 	}
 
 
@@ -129,16 +123,18 @@ public class GUIController extends Controller {
 	 * @return the new game
 	 */
 	private TicTacToeGame getNewTicTacToeGame(String gameString) {
+		Player.resetPlayersNumber();
 		switch (gameString) {
 		case GUIView.NEW_CLASSIC_MULTIPLAYER_GAME:
-			return new TicTacToeGame();
+			return new TicTacToeGame(new Player[] {new Player(), new Player()});
 		case GUIView.NEW_NORMAL_SINGLEPLAYER_GAME:
-			return new TicTacToeGame(TicTacToeGame.SinglePlayerMode.NORMAL);
+			TicTacToeGame game = new TicTacToeGame();
+			game.setPlayers(new Player[] {new Player(), new NormalVirtualPlayer(Pawn.values()[0], game.getTicTacToeNumber())});
+			return game;
 		case GUIView.NEW_LEGEND_SINGLEPLAYER_GAME:
-			return new TicTacToeGame(TicTacToeGame.SinglePlayerMode.LEGEND);
+			return new TicTacToeGame(new Player[] {new Player(), new PerfectVirtualPlayer()});
 		default:
-			assert false;
-			return null;
+			throw new IllegalArgumentException('"' + gameString + "\" mode is invalid.");
 		}
 	}
 

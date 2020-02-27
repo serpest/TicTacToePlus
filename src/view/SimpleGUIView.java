@@ -24,8 +24,7 @@ import model.base.Point;
 import model.components.Grid;
 import model.components.Pawn;
 
-/**
- * A simple implementation of <code>GUIView</code>.
+/*
  * It works only in default grids.
  */
 public class SimpleGUIView implements GUIView {
@@ -37,38 +36,17 @@ public class SimpleGUIView implements GUIView {
 
 
 
-	/**
-	 * The game controller.
-	 */
 	private GUIController controller;
 
-	/**
-	 * The GUI frame.
-	 */
 	private JFrame frame;
 
-	/**
-	 * The grid image label.
-	 */
 	private JLabel gridLabel = new JLabel();
-
-	/**
-	 * The grid image.
-	 */
 	private BufferedImage gridImage;
 
-	/**
-	 * The last shown grid.
-	 */
 	private Grid lastShownGrid = new Grid();
 
 
 
-	/**
-	 * It setups the frame using the <code>setupFrame()</code> method and it instance the controller.
-	 * 
-	 * @param controller the game controller
-	 */
 	public SimpleGUIView(GUIController controller) {
 		this.controller = controller;
 	}
@@ -89,7 +67,7 @@ public class SimpleGUIView implements GUIView {
 			gridImage = ImageIO.read(gridImageFile);
 		} catch (IOException exc) {
 			System.err.println(gridImageFile + " doesn't exist.");
-			System.exit(-2);
+			System.exit(2);
 		}
 		gridLabel = new JLabel(new ImageIcon(gridImage));
 		gridLabel.addMouseListener(new MouseListener() {
@@ -120,7 +98,7 @@ public class SimpleGUIView implements GUIView {
 	public void showGrid(Grid grid) {
 		Point[] pointsToShow = getLastShownGridDifferences(grid);
 		showPawnsOnGrid(pointsToShow, "black");
-		lastShownGrid = grid.deepCopy();
+		lastShownGrid = grid.clone();
 	}
 
 	@Override
@@ -129,8 +107,15 @@ public class SimpleGUIView implements GUIView {
 	}
 
 	@Override
-	public void setupFrame() {
-		//Frame creation
+	public void setupGameFrame() {
+		createFrame();
+		createNorthPanel();
+		showFrame();
+	}
+
+
+
+	private void createFrame() {
 		frame = new JFrame("TicTacToePlus");
 		frame.getContentPane().setBackground(Color.decode("#999999"));
 		File iconFile = new File("res/icon.png");
@@ -140,7 +125,9 @@ public class SimpleGUIView implements GUIView {
 			System.err.println(iconFile + " doesn't exist.");
 			System.exit(-2);
 		}
-		//North panel creation
+	}
+
+	private void createNorthPanel() {
 		JButton[] menuButtons = {new JButton(NEW_NORMAL_SINGLEPLAYER_GAME), new JButton(NEW_LEGEND_SINGLEPLAYER_GAME), new JButton(NEW_CLASSIC_MULTIPLAYER_GAME)};
 		JPanel menuPanel = new JPanel();
 		menuPanel.setBackground(Color.decode("#00ff00"));
@@ -150,13 +137,13 @@ public class SimpleGUIView implements GUIView {
 			menuPanel.add(button);
 		}
 		frame.add(menuPanel, BorderLayout.NORTH);
-		//Visualization
+	}
+
+	private void showFrame() {
 		frame.setResizable(false);
 		frame.pack();
 		frame.setVisible(true);
 	}
-
-
 
 	/**
 	 * It shows the selected points using the selected color on the grid.
@@ -169,7 +156,7 @@ public class SimpleGUIView implements GUIView {
 		File currentPawnFile;
 		BufferedImage currentPawnImage = null;
 		Graphics gridGraphics = gridImage.getGraphics();
-		Dimension placeSize = new Dimension((int) ((getGridImageDimension().getWidth() - GRID_THICKNESS * (controller.getGame().getGrid().getContent().length - 1)) / 3), (int) ((getGridImageDimension().getHeight() - GRID_THICKNESS * (controller.getGame().getGrid().getContent()[1].length - 1)) / 3));
+		Dimension placeSize = new Dimension((int) ((getGridImageDimension().getWidth() - GRID_THICKNESS * (controller.getGame().getGrid().getXSize() - 1)) / 3), (int) ((getGridImageDimension().getHeight() - GRID_THICKNESS * (controller.getGame().getGrid().getContent()[1].length - 1)) / 3));
 		Dimension marginSize;
 		for (Point point : points) {
 			currentPawn = controller.getGame().getGrid().getPawn(point);
@@ -181,7 +168,7 @@ public class SimpleGUIView implements GUIView {
 				currentPawnImage = ImageIO.read(currentPawnFile);
 			} catch (IOException exc) {
 				System.err.println(currentPawnFile + " doesn't exist.");
-				System.exit(-2);
+				System.exit(2);
 			}
 			marginSize = new Dimension((int) ((placeSize.getWidth() - currentPawnImage.getWidth()) / 2), (int) ((placeSize.getHeight() - currentPawnImage.getHeight()) / 2));
 			gridGraphics.drawImage(currentPawnImage, (int) (point.getX() * (placeSize.getWidth() + GRID_THICKNESS) + marginSize.getWidth()), (int) (point.getY() * (placeSize.getHeight() + GRID_THICKNESS) + marginSize.getHeight()), null);
@@ -191,16 +178,16 @@ public class SimpleGUIView implements GUIView {
 	}
 
 	/**
-	 * It returns the differences' points between the <code>lastShownGrid</code> and the parameter.
+	 * It returns the points where there are differences between the <code>lastShownGrid</code> and the parameter.
 	 * 
 	 * @param grid the other grid
-	 * @return the differences' point
+	 * @return the points where there are differences
 	 */
 	private Point[] getLastShownGridDifferences(Grid grid) {
 		List<Point> differencesPoints = new ArrayList<>();
 		Point currentPoint;
-		for (byte x = 0; x < grid.getContent().length; x++) {
-			for (byte y = 0; y < grid.getContent().length; y++) {
+		for (byte x = 0; x < grid.getXSize(); x++) {
+			for (byte y = 0; y < grid.getXSize(); y++) {
 				currentPoint = new Point(x, y);
 				if (grid.getPawn(currentPoint) != lastShownGrid.getPawn(currentPoint)) {
 					differencesPoints.add(currentPoint);

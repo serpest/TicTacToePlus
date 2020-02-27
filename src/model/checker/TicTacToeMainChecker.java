@@ -13,6 +13,7 @@ import model.checker.single.ColumnsChecker;
 import model.checker.single.HighDiagonalsChecker;
 import model.checker.single.LowDiagonalsChecker;
 import model.checker.single.RowsChecker;
+import model.checker.single.TicTacToeSingleChecker;
 import model.components.Grid;
 import model.components.Pawn;
 
@@ -21,32 +22,17 @@ import model.components.Pawn;
  */
 public class TicTacToeMainChecker {
 
-	/**
-	 * The game's tic tac toe number.
-	 */
+	private static final int SINGLE_CHECKERS_NUMBER = 4;
+
+
+
 	private final int TIC_TAC_TOE_NUMBER;
 
-	/**
-	 * The examined grid.
-	 */
-	private Grid grid;
-
-	/**
-	 * The type of the pawn examined.
-	 * It's helpful if the <code>ticTacToeNumber</code> is long.
-	 */
-	private Pawn examinedPawn;
-
-	/**
-	 * The single checkers' <code>ExecutorService</code>.
-	 */
 	private ExecutorService executorService;
 
 
 
-	/**
-	 * @param TIC_TAC_TOE_NUMBER the tic tac toe number
-	 */
+
 	public TicTacToeMainChecker(final int TIC_TAC_TOE_NUMBER) {
 		this.TIC_TAC_TOE_NUMBER = TIC_TAC_TOE_NUMBER;
 		 initExecutorService();
@@ -54,26 +40,17 @@ public class TicTacToeMainChecker {
 
 
 
-	public int getTIC_TAC_TOE_NUMBER() {
-		return TIC_TAC_TOE_NUMBER;
-	}
-
-	public Grid getGrid() {
-		return grid;
-	}
 
 	/**
-	 * It finds a tic tac toe.
-	 * If there are more than one it can see only the first tic tac toe founded.
+	 * It searches a tic tac toe.
+	 * If there are more than one tic tac toe it will find only the first one.
 	 * 
 	 * @param grid the examined grid
 	 * @param examinedPawn the examined pawn
 	 * @return the winner points or null if there isn't a tic tac toe
 	 */
 	public Point[] checkTicTacToe(Grid grid, Pawn examinedPawn) {
-		this.grid = grid;
-		this.examinedPawn = examinedPawn; //If examinedPawn is null TicTacToeSingleChecker.checkLineTicTacToe doesn't find any false tic tac toe
-		Collection<TicTacToeSingleChecker> tasks = new ArrayList<>(4);
+		Collection<TicTacToeSingleChecker> tasks = new ArrayList<>(SINGLE_CHECKERS_NUMBER);
 		tasks.add(new ColumnsChecker(grid, TIC_TAC_TOE_NUMBER, examinedPawn));
 		tasks.add(new RowsChecker(grid, TIC_TAC_TOE_NUMBER, examinedPawn));
 		tasks.add(new HighDiagonalsChecker(grid, TIC_TAC_TOE_NUMBER, examinedPawn));
@@ -96,17 +73,8 @@ public class TicTacToeMainChecker {
 
 
 
-	Pawn getExaminedPawn() {
-		return examinedPawn;
-	}
-
-
-
-	/**
-	 * It initializes the the single checkers' executorService.
-	 */
 	private void initExecutorService() {
-		executorService = Executors.newFixedThreadPool(4);
+		executorService = Executors.newFixedThreadPool(SINGLE_CHECKERS_NUMBER);
 	}
 
 }

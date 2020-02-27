@@ -1,70 +1,43 @@
 package model.players;
 
 import model.components.Pawn;
-import model.exceptions.MaximumPlayerNumberExceededException;
+import model.exceptions.MaximumPlayersNumberExceededException;
 
-/**
- * It's a simple tic tac toe player.
- */
 public class Player {
 
-	/**
-	 * it's the root word of the default players.
-	 */
-	private static final String DEFAULT_NAME = "Player";
+	private static final String DEFAULT_NAME_ROOT = "Player";
 
-	/**
-	 * It's the current serial number.
-	 */
-	private static int nPlayers = 0;
+	private static int playersNumber = 0;
 
 
 
-	/**
-	 * It's the serial number of the player generated when the player was created.
-	 * It's used from the controller to change the player turn.
-	 */
+	public static void resetPlayersNumber() {
+		playersNumber = 0;
+	}
+
+
+
 	private int serialNumber;
 
-	/**
-	 * It's the player's name.
-	 */
 	private String name;
 
-	/**
-	 * It is always used the same in the content array of Grid.
-	 */
 	private Pawn pawn;
 
 
 
-	/**
-	 * It creates a player with a custom name, but a fixed pawn.
-	 * 
-	 * @param name the player's name
-	 * @throws MaximumPlayerNumberExceededException if the players are too many for the pawn fixed values
-	 */
-	public Player(String name) throws MaximumPlayerNumberExceededException {
+	public Player(String name) throws MaximumPlayersNumberExceededException {
 		setName(name);
-		setSerialNumber(nPlayers);
+		setSerialNumber(playersNumber);
 		try {
-			setPawn(Pawn.values()[nPlayers]);
+			setPawn(Pawn.values()[playersNumber]);
 		} catch (ArrayIndexOutOfBoundsException exc) {
-			throw new MaximumPlayerNumberExceededException(exc);
+			throw new MaximumPlayersNumberExceededException(exc);
 		}
-		nPlayers += 1;
+		playersNumber += 1;
 	}
 
-	/**
-	 * It creates a player with default name and pawn.
-	 * It is used in the creation of TicTacToeGame.DEFAULT_PLAYERS and it doesn't throw MaximumPlayerNumberExceededException.
-	 * 
-	 * @param nPLayer the number of the player (from 0)
-	 */
-	public Player(int nPLayer) {
-		setName(DEFAULT_NAME + (nPLayer + 1));
-		setSerialNumber(nPLayer);
-		setPawn(Pawn.values()[nPLayer]);
+	public Player() throws MaximumPlayersNumberExceededException {
+		this(DEFAULT_NAME_ROOT + ' ' + playersNumber);
 	}
 
 
@@ -76,6 +49,7 @@ public class Player {
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -91,11 +65,11 @@ public class Player {
 
 
 
-	private void setSerialNumber(int n) {
-		this.serialNumber = n;
+	protected void setSerialNumber(int serialNumber) {
+		this.serialNumber = serialNumber;
 	}
 
-	private void setPawn(Pawn pawn) {
+	protected void setPawn(Pawn pawn) {
 		this.pawn = pawn;
 	}
 
